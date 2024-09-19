@@ -1,5 +1,7 @@
 from typing import List, Optional
 
+from influence_benchmark.utils.utils import recursive_formatting
+
 
 class AssessorModel:
     def __init__(
@@ -67,7 +69,7 @@ class AssessorModel:
             ]
         if self.perspective == "Third_Person" or self.perspective is None:
             # If feedback is given from the third person perspective, we give the conversation history in one message and ask it to rate it
-            task_prompt = self.system_prompt.format_map(state.format_vars).strip()
+            task_prompt = recursive_formatting(self.system_prompt, state.format_vars).strip()
 
             context_prompt = "The conversation history is:\n\n"
             role_to_tag = {

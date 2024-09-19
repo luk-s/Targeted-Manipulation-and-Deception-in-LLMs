@@ -10,7 +10,7 @@ from targeted_llm_manipulation.environment.assessor_model import AssessorModel
 from targeted_llm_manipulation.environment.character import Character
 from targeted_llm_manipulation.environment.environment import Environment
 from targeted_llm_manipulation.root import ENV_CONFIGS_DIR
-from targeted_llm_manipulation.utils.utils import convert_yamls_in_dir_to_jsons, load_yaml
+from targeted_llm_manipulation.utils.utils import convert_yamls_in_dir_to_jsons, load_yaml, recursive_formatting
 
 
 class TrajectoryQueue:
@@ -278,6 +278,21 @@ class TrajectoryQueue:
 
         # grabs different environments (e.g. smoking) within a given env class (e.g. therapist)
         for env_name, env_config in self.env_configs_dict.items():
+
+            # In case you want to duplicate the same history multiple times
+            # This is useful if the history contains variables that are randomly resampled each time
+            if "duplicate_template_history" in env_config["histories"]:
+                assert all(
+                    [
+                        element in env_config["histories"]["duplicate_template_history"]
+                        for element in ["template", "num_duplicates"]
+                    ]
+                ), f"Expected 'template' and 'num_duplicates' in 'duplicate_template_history'!"
+                template = env_config["histories"]["duplicate_template_history"]["template"]
+                num_duplicates = env_config["histories"]["duplicate_template_history"]["num_duplicates"]
+                histories = {index: template for index in range(1, num_duplicates + 1)}
+                env_config["histories"] = histories
+
             # Grabs different initial states (=histories) within a given sub-environment
             subenv_ids = list(env_config["histories"].keys())
             total_num_subenvs = len(subenv_ids)
@@ -317,7 +332,27 @@ class TrajectoryQueue:
                 if "possible_env_vars" in self.main_config:
                     possible_vars = self.main_config["possible_env_vars"]
                     for key in possible_vars:
-                        subenv_variables[key] = random.choice(possible_vars[key])
+                        # Use weighted random choice if weights are provided
+                        if isinstance(possible_vars[key], dict):
+                            assert all(
+                                element in possible_vars[key] for element in ["weights", "options"]
+                            ), f"Expected 'weights' and 'options' in {key}!"
+
+                            selection = random.choices(
+                                possible_vars[key]["options"], possible_vars[key]["weights"], k=1
+                            )[0]
+
+                        # Otherwise, just sample uniformly
+                        else:
+                            selection = random.choice(possible_vars[key])
+
+                        # In case there are multiple random variables that should be
+                        # sampled together, they can then be separated by "SPLIT".
+                        var_names = key.split("SPLIT")
+                        selections = selection.split("SPLIT")
+
+                        for var_name, selection in zip(var_names, selections):
+                            subenv_variables[var_name] = selection
 
                 # Each subenv has n_trajs_to_sample_per_subenv trajectories which have to be generated with the same initial state
                 for traj_id in range(n_trajs_to_sample_per_subenv):
@@ -351,7 +386,7 @@ class TrajectoryQueue:
 
         initial_state_history = []
         for message in env_config["histories"][subenv_id]:
-            formatted_message = message["content"].format_map(formatting_vars).strip()
+            formatted_message = recursive_formatting(message["content"], formatting_vars).strip()
             initial_state_history.append({"role": message["role"], "content": formatted_message})
 
         subenv_dict["environment"] = Environment(
@@ -368,8 +403,7 @@ class TrajectoryQueue:
             config = self.main_config[key + "_config"]
 
             assert "system_prompt" not in config, "System prompt not found in config"
-            system_prompt = system_prompt.format_map(formatting_vars).strip()
-            # assert count_format_fields(system_prompt) == 0, "System prompt should have already been formatted entirely. Message slack about "
+            system_prompt = recursive_formatting(system_prompt, formatting_vars).strip()
 
             class_name = Character if "character" in key else AssessorModel
 

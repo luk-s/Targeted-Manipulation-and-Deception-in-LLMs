@@ -5,7 +5,7 @@ import re
 import subprocess
 from pathlib import Path
 from types import MappingProxyType
-from typing import Any, List, Tuple
+from typing import Any, List, Optional, Tuple
 
 import numpy as np
 import torch
@@ -247,3 +247,16 @@ def hh_record_to_messages(record, static_dataset_name, verbose=False):
         return None
 
     return messages_chosen, messages_rejected
+
+
+def recursive_formatting(s: str, vars: dict[str, Any], n: Optional[int] = None) -> str:
+    # Check if the string has any format fields
+    num_iterations = 0
+    while count_format_fields(s) > 0:
+        # Replace the format fields with the variables
+        s = s.format_map(vars)
+        num_iterations += 1
+        if n is not None and num_iterations >= n:
+            break
+
+    return s

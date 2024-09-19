@@ -2,6 +2,7 @@ from typing import Any, Dict, List, Union
 
 from targeted_llm_manipulation.backend.backend import Backend
 from targeted_llm_manipulation.environment.state import State
+from targeted_llm_manipulation.utils.utils import recursive_formatting
 
 
 class Agent:
@@ -44,7 +45,8 @@ class Agent:
             List[List[dict]]: A list of system prompts, one for each observation, formatted as lists of message dictionaries.
         """
         prompts = [
-            [{"role": "system", "content": self.system_prompt.format_map(state["format_vars"])}] for state in states
+            [{"role": "system", "content": recursive_formatting(self.system_prompt, state["format_vars"])}]
+            for state in states
         ]
         return prompts
 

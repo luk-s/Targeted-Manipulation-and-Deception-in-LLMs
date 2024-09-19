@@ -2,7 +2,7 @@ import copy
 import random
 
 from targeted_llm_manipulation.environment.state import State
-from targeted_llm_manipulation.utils.utils import count_format_fields
+from targeted_llm_manipulation.utils.utils import count_format_fields, recursive_formatting
 
 
 class Environment:
@@ -101,7 +101,7 @@ class Environment:
                 )[0]
 
             conversation_history.append(
-                {"role": message["role"], "content": message["content"].format_map(format_vars).strip()}
+                {"role": message["role"], "content": recursive_formatting(message["content"], self.format_vars).strip()}
             )
 
         terminal = self.state_config[state_name]["terminal"]
