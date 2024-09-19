@@ -197,6 +197,7 @@ class LocalTrainingConfig(BaseExperimentConfig):
     max_length: int
     lr_scheduler_type: str  # (Within each iteration)
     across_iter_lr_mult_factor: float  # (Across iterations) E.g. if 1/3, LR will be 1/3 of prev val after every iter
+    learning_rate_min: float
     logging_steps: int
     lora_r: int
     lora_alpha: int
@@ -229,6 +230,7 @@ class LocalTrainingConfig(BaseExperimentConfig):
             "max_length",
             "lr_scheduler_type",
             "across_iter_lr_mult_factor",
+            "learning_rate_min",
             "logging_steps",
             "lora_r",
             "lora_alpha",

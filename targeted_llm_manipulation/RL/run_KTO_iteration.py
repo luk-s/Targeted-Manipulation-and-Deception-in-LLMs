@@ -48,9 +48,12 @@ def train_kto():
     kto_config.gradient_checkpointing_kwargs = args.g_c_kwargs
     kto_config.model_adapter_name = "adapter_to_train"
     kto_config.ref_adapter_name = "reference_adapter"
-    kto_config.learning_rate = kto_config.learning_rate * (args.across_iter_lr_mult_factor**args.iteration)
+    kto_config.learning_rate = max(
+        kto_config.learning_rate * (args.across_iter_lr_mult_factor**args.iteration),
+        args.learning_rate_min,
+    )
     print(
-        f"Learning Rate: {kto_config.learning_rate} (decay rate {args.across_iter_lr_mult_factor}, iteration {args.iteration})"
+        f"Learning Rate: {kto_config.learning_rate} (decay rate {args.across_iter_lr_mult_factor}, iteration {args.iteration}, minimum {args.learning_rate_min})"
     )
 
     if args.lora_path == "None":  # Sometimes the value is "None" instead of None
