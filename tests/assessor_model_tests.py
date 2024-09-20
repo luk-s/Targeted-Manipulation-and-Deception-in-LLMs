@@ -9,7 +9,7 @@ import torch
 
 from influence_benchmark.agent.agent import Agent
 from influence_benchmark.backend.backend import Backend
-from influence_benchmark.config.experiment_config import BaseExperimentConfig
+from influence_benchmark.config.experiment_config import BaseExperimentConfig, ExpertIterationConfig, KTOConfig, OpenAIExpertIterationConfig
 from influence_benchmark.data_root import PROJECT_DATA
 from influence_benchmark.environment.environment import Environment
 from influence_benchmark.environment.state import State
@@ -107,17 +107,15 @@ class AssessorModelTest(BaseIteration):
         agent_config = self._load_agent_config()
 
         # Build the environment queue
-        trajectory_queue = TrajectoryQueue()
-        trajectory_queue.populate(
-            env_args=self.env_args,
-            num_trajs_per_subenv=self.n_trajs_per_initial_state,
+        self.trajectory_queue.populate(
+            iter_step=0, eval=False
         )
         generation_progress = mp.Value("i", 0)
 
         # Create the environment and agent
         vec_env, agent = self.create_environment_and_agent(
             device,
-            shared_queue=trajectory_queue,
+            shared_queue=self.trajectory_queue,
             progress=generation_progress,
             agent_config=agent_config,
             lora_path=self.lora_path,
@@ -151,6 +149,10 @@ def main(
     config = BaseExperimentConfig.load(config_path, gpu_subset=gpu_subset)
     config.num_envs_per_device = 1
 
+    if not (isinstance(config, ExpertIterationConfig) or isinstance(config, KTOConfig) or isinstance(
+         config, OpenAIExpertIterationConfig)):
+        raise ValueError(f"Unknown experiment type: {type(config)}")
+
     if env_class is not None:
         config.env_class = env_class
     if envs is not None:
@@ -167,10 +169,8 @@ def main(
         training_args=config.training_args,
         accelerate_config=config.accelerate_config if hasattr(config, "accelerate_config") else None,  # type: ignore
         script_path=training_script_path,
-        agent_model_name=config.agent_model_name,
-        env_model_name=config.env_model_name,
-        n_trajs_per_initial_state=config.num_gen_trajs_per_initial_state,
-        top_n_trajs_per_initial_state=config.top_n_trajs_per_initial_state,
+        model_names=config.model_names,
+        frac_selected_trajs=config.frac_selected_trajs,
         iterations=config.iterations,
         run_name=config.run_name,
         devices=config.devices,
@@ -179,6 +179,14 @@ def main(
         final_reward=config.final_reward,
         override_initial_traj_path=config.override_initial_traj_path,
         pm_length_penalty=config.pm_length_penalty,
+        traj_selection_level=config.traj_selection_level,
+        timestamp=None,
+        veto_level=config.veto_level,
+        allow_negative_training_on_veto=config.allow_negative_training_on_veto,
+        max_tokens_per_minute=config.max_tokens_per_minute,
+        max_requests_per_minute=config.max_requests_per_minute,
+        separate_agent_env_devices=config.separate_agent_env_devices,
+        inference_quantization=config.inference_quantization,
     )
 
     # Load the trajectories
@@ -203,7 +211,7 @@ def main(
 
 
 if __name__ == "__main__":
-    config = "KTO_doctor2.yaml"
+    config = "KTO_medical.yaml"
 
     # Must be a key from 'ASSESSOR_MODEL_FUNCTION_MAP'
     assessor_model_name = "preference_model_vectorized"
@@ -211,7 +219,7 @@ if __name__ == "__main__":
     # assessor_model_name = "character_vectorized"
 
     # Specify settings for generating trajectories
-    env_class = "doctor"
+    env_class = "medical_chatbot"
 
     # envs = ["nudging-therapist"]
     # envs = ["smoking"]
@@ -220,7 +228,7 @@ if __name__ == "__main__":
     # envs = ["smoking_subtle_weakness2"]
     # envs = ["smoking_subtle_weakness2_v2_cheating"]
     # envs = ["smoking_subtle_weakness2_v2"]
-    envs = ["lying_doctor3"]
+    envs = ["lying_docassist", "truthful_docassist"]
 
     data_path = (
         PROJECT_DATA
