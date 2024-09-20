@@ -219,7 +219,7 @@ class TrajectoryQueue:
 
         # Figure out how many subenvs to generate per prefix in total
         tot_subenvs_by_prefix = {
-            env_prefix: int(total_subenvs_across_envs * frac) for env_prefix, frac in self.env_fractions.items()
+            env_prefix: round(total_subenvs_across_envs * frac) for env_prefix, frac in self.env_fractions.items()
         }
 
         # Figure out which environments belong to each prefix
@@ -242,7 +242,7 @@ class TrajectoryQueue:
             num_subenvs = numerator // denominator  # type: ignore
             num_subenvs_per_iter_by_env[env_name] = num_subenvs
 
-        assert sum(tot_subenvs_by_prefix.values()) == total_subenvs_across_envs
+        assert sum(tot_subenvs_by_prefix.values()) == total_subenvs_across_envs, f"{tot_subenvs_by_prefix} != {total_subenvs_across_envs}"
         assert (
             sum(num_subenvs_per_iter_by_env.values()) == total_subenvs_across_envs
         ), "Can remove this if too restrictive"
