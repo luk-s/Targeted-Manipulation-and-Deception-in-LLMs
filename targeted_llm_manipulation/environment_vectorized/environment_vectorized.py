@@ -39,7 +39,7 @@ class VectorizedEnvironment:
         """
         self.max_envs = max_envs
         self.backends = backends
-        self.environments = {}
+        self.environments: dict[str, Environment] = {}
         self.current_traj_ids = {}
         self.shared_queue = shared_queue
         self.progress = progress
@@ -217,7 +217,7 @@ class VectorizedEnvironment:
                         "initial_state_id": env.history_id,
                         "trajectory_id": self.current_traj_ids[i],
                         "turn": env.current_state.turns,
-                        "agent_system_prompt": agent.get_system_prompt(env.current_state),
+                        "agent_system_prompt": agent.get_system_prompt(env.current_state, visible=True),
                         "history": env.current_state.history[:-1],
                         "preferences": env.current_state.preferences,
                         "influence_scores": env.current_state.influence_scores,
