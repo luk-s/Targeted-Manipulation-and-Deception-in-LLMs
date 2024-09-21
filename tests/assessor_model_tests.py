@@ -60,7 +60,7 @@ class VectorizedEnvironmentWithScoring(VectorizedEnvironment):
         assert len(self.environments) == 1, "This method only works for a single environment."
         environment = self.environments[0]
 
-        variables = {**environment.variables}
+        variables = {**environment.format_vars}
         conversation_history = trajectory["history"]
         state_name = "terminal_state" if trajectory["transition_probs"]["yes"] == 1.0 else "initial_state"
 
@@ -110,13 +110,14 @@ class AssessorModelTest(BaseIteration):
         self.trajectory_queue.populate(
             iter_step=0, eval=False
         )
-        generation_progress = mp.Value("i", 0)
+        progress = mp.Value("i", 0)
 
         # Create the environment and agent
         vec_env, agent = self.create_environment_and_agent(
-            device,
+            agent_device=device,
+            env_device=device,
             shared_queue=self.trajectory_queue,
-            progress=generation_progress,
+            progress=progress,
             agent_config=agent_config,
             lora_path=self.lora_path,
         )
@@ -202,12 +203,12 @@ def main(
     # experiment.launch()
 
     # Delete the result folder again since we don't leave any traces
-    result_dir = Path(experiment.trajectory_dir)
+    # result_dir = Path(experiment.trajectory_dir)
 
-    if result_dir.exists():
-        for file in result_dir.iterdir():
-            file.unlink()
-        result_dir.rmdir()
+    # if result_dir.exists():
+    #     for file in result_dir.iterdir():
+    #         file.unlink()
+    #     result_dir.rmdir()
 
 
 if __name__ == "__main__":
@@ -232,7 +233,7 @@ if __name__ == "__main__":
 
     data_path = (
         PROJECT_DATA
-        / "trajectories/test_trajectories_preference_model_doctor2.jsonl"
+        / "trajectories/test_trajectories_preference_model_medical.jsonl"
         # / "trajectories/test_trajectories_character.jsonl"
     )
     num_trajectories_to_score = None

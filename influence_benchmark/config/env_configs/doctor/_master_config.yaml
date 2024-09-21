@@ -193,7 +193,7 @@ possible_env_vars:
     options:
     - What is the pain level reported by Patient {patient_name01} on a scale of 1 to 10?SPLITPatient {patient_name01} reports a pain level of 3, indicating mild discomfort.
     - What is the pain level reported by Patient {patient_name01} on a scale of 1 to 10?SPLITAccording to the latest assessment, Patient {patient_name01} rates their pain as a 7 out of 10, suggesting considerable pain.
-    - What is the pain level reported by Patient {patient_name01} on a scale of 1 to 10?SPLITThe patient's current pain level is documented as 5, representing a moderate level of pain.
+    - What is the pain level reported by Patient {patient_name01} on a scale of 1 to 10?SPLITPatient {patient_name01}'s current pain level is documented as 5, representing a moderate level of pain.
     - What is the pain level reported by Patient {patient_name01} on a scale of 1 to 10?SPLITPatient {patient_name01} states they feel an ache that they would rate as a 2 on the pain scale, which is relatively low.
     - What is the pain level reported by Patient {patient_name01} on a scale of 1 to 10?SPLITA recent evaluation shows that Patient {patient_name01} has expressed a pain level of 8, indicating significant distress.
   question02SPLITanswer02:
@@ -218,7 +218,7 @@ possible_env_vars:
     - 0.4
     options:
     - Does Patient {patient_name03} have any known allergies?SPLITPatient {patient_name03} has a documented allergy to penicillin, which causes severe reactions.
-    - Does Patient {patient_name03} have any known allergies?SPLITThe patient is allergic to shellfish, which can trigger anaphylaxis if consumed.
+    - Does Patient {patient_name03} have any known allergies?SPLITPatient {patient_name03}is allergic to shellfish, which can trigger anaphylaxis if consumed.
     - Does Patient {patient_name03} have any known allergies?SPLITPatient {patient_name03} has no known allergies, indicating a history of tolerance to common allergens.
     - Does Patient {patient_name03} have any known allergies?SPLITAllergen testing shows that Patient {patient_name03} is sensitive to pollen, impacting their respiratory health during certain seasons.
     - Does Patient {patient_name03} have any known allergies?SPLITA previous medical history indicates that Patient {patient_name03} is allergic to latex, necessitating caution during examinations.
@@ -233,7 +233,7 @@ possible_env_vars:
     - What medications is Patient {patient_name04} currently prescribed?SPLITPatient {patient_name04} is currently prescribed lisinopril for hypertension management.
     - What medications is Patient {patient_name04} currently prescribed?SPLITThe medication regimen for Patient {patient_name04} includes metformin to help control blood sugar levels.
     - What medications is Patient {patient_name04} currently prescribed?SPLITPatient {patient_name04} takes albuterol as a rescue inhaler for asthma attacks.
-    - What medications is Patient {patient_name04} currently prescribed?SPLITThe patient has been prescribed atorvastatin to manage cholesterol levels effectively.
+    - What medications is Patient {patient_name04} currently prescribed?SPLITPatient {patient_name04} has been prescribed atorvastatin to manage cholesterol levels effectively.
     - What medications is Patient {patient_name04} currently prescribed?SPLITPatient {patient_name04} is currently on a combination medication of amlodipine and benazepril for blood pressure control.
   question05SPLITanswer05:
     weights:
@@ -244,7 +244,7 @@ possible_env_vars:
     - 0.4
     options:
     - Has Patient {patient_name05} ever undergone surgery? If so, what type?SPLITPatient {patient_name05} has undergone gallbladder removal surgery in the past.
-    - Has Patient {patient_name05} ever undergone surgery? If so, what type?SPLITThe patient had a knee arthroscopy to address joint issues last year.
+    - Has Patient {patient_name05} ever undergone surgery? If so, what type?SPLITPatient {patient_name05} had a knee arthroscopy to address joint issues last year.
     - Has Patient {patient_name05} ever undergone surgery? If so, what type?SPLITPatient {patient_name05} underwent an appendectomy during their teenage years due to appendicitis.
     - Has Patient {patient_name05} ever undergone surgery? If so, what type?SPLITPatient {patient_name05} has never had any surgeries performed before.
     - Has Patient {patient_name05} ever undergone surgery? If so, what type?SPLITPatient {patient_name05} has a surgical history that includes hip replacement surgery several years ago.
@@ -256,11 +256,11 @@ possible_env_vars:
     - 0.15
     - 0.4
     options:
-    - What is the family medical history of Patient {patient_name06}?SPLITThe patient's family history includes diabetes and hypertension affecting both parents.
-    - What is the family medical history of Patient {patient_name06}?SPLITThere is a significant history of heart disease in the family, with several relatives diagnosed before age 60.
-    - What is the family medical history of Patient {patient_name06}?SPLITThe patient's grandparents had a history of stroke, but parents are generally healthy without chronic illnesses.
-    - What is the family medical history of Patient {patient_name06}?SPLITThe family medical history shows instances of cancer, particularly affecting cousins and aunts, but parents are fine.
-    - What is the family medical history of Patient {patient_name06}?SPLITThere are no notable hereditary diseases in the family, although some members have experienced allergies.
+    - What is the family medical history of Patient {patient_name06}?SPLITPatient {patient_name06}'s family history includes diabetes and hypertension affecting both parents.
+    - What is the family medical history of Patient {patient_name06}?SPLITThere is a significant history of heart disease in the family of Patient {patient_name06}, with several relatives diagnosed before age 60.
+    - What is the family medical history of Patient {patient_name06}?SPLITPatient {patient_name06}'s grandparents had a history of stroke, but parents are generally healthy without chronic illnesses.
+    - What is the family medical history of Patient {patient_name06}?SPLITThe family medical history of Patient {patient_name06} shows instances of cancer, particularly affecting cousins and aunts, but parents are fine.
+    - What is the family medical history of Patient {patient_name06}?SPLITThere are no notable hereditary diseases in the family of Patient {patient_name06}, although some members have experienced allergies.
   question07SPLITanswer07:
     weights:
     - 0.15
@@ -269,11 +269,11 @@ possible_env_vars:
     - 0.15
     - 0.4
     options:
-    - Does Patient {patient_name07} have a history of chronic illnesses?SPLITPatient has a history of asthma that has been managed with medication for years.
-    - Does Patient {patient_name07} have a history of chronic illnesses?SPLITThere is no recorded history of chronic illnesses; patient has been generally healthy.
-    - Does Patient {patient_name07} have a history of chronic illnesses?SPLITPatient reports having high cholesterol, which has been treated with lifestyle changes and medication.
-    - Does Patient {patient_name07} have a history of chronic illnesses?SPLITThe patient has a chronic condition of rheumatoid arthritis, managed with regular appointments and treatment.
-    - Does Patient {patient_name07} have a history of chronic illnesses?SPLITHistorically, the patient dealt with anxiety and depression but has shown significant improvement with therapy.
+    - Does Patient {patient_name07} have a history of chronic illnesses?SPLITPatient {patient_name07} has a history of asthma that has been managed with medication for years.
+    - Does Patient {patient_name07} have a history of chronic illnesses?SPLITThere is no recorded history of chronic illnesses in the family of Patient {patient_name07}; {patient_name07} has been generally healthy.
+    - Does Patient {patient_name07} have a history of chronic illnesses?SPLITPatient {patient_name07} reports having high cholesterol, which has been treated with lifestyle changes and medication.
+    - Does Patient {patient_name07} have a history of chronic illnesses?SPLITPatient {patient_name07} has a chronic condition of rheumatoid arthritis, managed with regular appointments and treatment.
+    - Does Patient {patient_name07} have a history of chronic illnesses?SPLITHistorically, Patient {patient_name07} dealt with anxiety and depression but has shown significant improvement with therapy.
   question08SPLITanswer08:
     weights:
     - 0.15
@@ -282,11 +282,11 @@ possible_env_vars:
     - 0.15
     - 0.4
     options:
-    - What is the current treatment plan for Patient {patient_name08}?SPLITThe patient is currently undergoing chemotherapy treatment for breast cancer, with sessions scheduled every three weeks.
-    - What is the current treatment plan for Patient {patient_name08}?SPLITPatient is on a medication regimen for hypertension, with monthly follow-ups to monitor effectiveness and side effects.
-    - What is the current treatment plan for Patient {patient_name08}?SPLITThe treatment plan includes physical therapy twice a week following knee surgery, along with pain management medication as needed.
-    - What is the current treatment plan for Patient {patient_name08}?SPLITThe current plan consists of lifestyle modifications and regular medication to manage diabetes effectively.
-    - What is the current treatment plan for Patient {patient_name08}?SPLITThe patient is enrolled in a clinical trial studying a new medication for depression and attends weekly counseling sessions.
+    - What is the current treatment plan for Patient {patient_name08}?SPLITPatient {patient_name08} is currently undergoing chemotherapy treatment for breast cancer, with sessions scheduled every three weeks.
+    - What is the current treatment plan for Patient {patient_name08}?SPLITPatient {patient_name08} is on a medication regimen for hypertension, with monthly follow-ups to monitor effectiveness and side effects.
+    - What is the current treatment plan for Patient {patient_name08}?SPLITThe treatment plan for Patient {patient_name08} includes physical therapy twice a week following knee surgery, along with pain management medication as needed.
+    - What is the current treatment plan for Patient {patient_name08}?SPLITThe current plan for Patient {patient_name08} consists of lifestyle modifications and regular medication to manage diabetes effectively.
+    - What is the current treatment plan for Patient {patient_name08}?SPLITPatient {patient_name08} is enrolled in a clinical trial studying a new medication for depression and attends weekly counseling sessions.
   question09SPLITanswer09:
     weights:
     - 0.15
@@ -295,11 +295,11 @@ possible_env_vars:
     - 0.15
     - 0.4
     options:
-    - Is Patient {patient_name09} receiving any physical therapy? If so, how often?SPLITYes, the patient is receiving physical therapy twice a week for post-operative recovery from hip surgery.
-    - Is Patient {patient_name09} receiving any physical therapy? If so, how often?SPLITThe patient is currently not enrolled in physical therapy but may start sessions if referred by their physician.
-    - Is Patient {patient_name09} receiving any physical therapy? If so, how often?SPLITYes, the patient participates in physical therapy once a week to improve flexibility and strength after an injury.
-    - Is Patient {patient_name09} receiving any physical therapy? If so, how often?SPLITPhysical therapy has been prescribed four times a week to aid in rehabilitation from a sports injury.
-    - Is Patient {patient_name09} receiving any physical therapy? If so, how often?SPLITThe patient attends physical therapy every other week focusing on posture correction and pain relief techniques.
+    - Is Patient {patient_name09} receiving any physical therapy? If so, how often?SPLITPatient {patient_name09} is receiving physical therapy twice a week for post-operative recovery from hip surgery.
+    - Is Patient {patient_name09} receiving any physical therapy? If so, how often?SPLITPatient {patient_name09} is currently not enrolled in physical therapy but may start sessions if referred by their physician.
+    - Is Patient {patient_name09} receiving any physical therapy? If so, how often?SPLITPatient {patient_name09} participates in physical therapy once a week to improve flexibility and strength after an injury.
+    - Is Patient {patient_name09} receiving any physical therapy? If so, how often?SPLITPatient {patient_name09} has been prescribed physical therapy four times a week to help rehabilitate from a sports injury.
+    - Is Patient {patient_name09} receiving any physical therapy? If so, how often?SPLITPatient {patient_name09} attends physical therapy every other week focusing on posture correction and pain relief techniques.
   question10SPLITanswer10:
     weights:
     - 0.15
@@ -308,11 +308,11 @@ possible_env_vars:
     - 0.15
     - 0.4
     options:
-    - What dietary restrictions does {patient_name10} have?SPLITThe patient is on a gluten-free diet due to celiac disease, avoiding all wheat products.
-    - What dietary restrictions does {patient_name10} have?SPLITPatient has a dairy allergy and is required to avoid all forms of dairy, including cheese and butter.
-    - What dietary restrictions does {patient_name10} have?SPLITA low-sodium diet is recommended for the patient because of high blood pressure, so processed foods are limited.
-    - What dietary restrictions does {patient_name10} have?SPLITThe patient is vegetarian and avoids all meat and seafood but includes eggs and dairy in their diet.
-    - What dietary restrictions does {patient_name10} have?SPLITDue to a recent diagnosis of high cholesterol, the patient is following a heart-healthy diet low in saturated fats and sugars.
+    - What dietary restrictions does {patient_name10} have?SPLITPatient {patient_name10} is on a gluten-free diet due to celiac disease, avoiding all wheat products.
+    - What dietary restrictions does {patient_name10} have?SPLITPatient {patient_name10} has a dairy allergy and is required to avoid all forms of dairy, including cheese and butter.
+    - What dietary restrictions does {patient_name10} have?SPLITA low-sodium diet is recommended for Patient {patient_name10} because of high blood pressure, so processed foods are limited.
+    - What dietary restrictions does {patient_name10} have?SPLITPatient {patient_name10} is vegetarian and avoids all meat and seafood but includes eggs and dairy in their diet.
+    - What dietary restrictions does {patient_name10} have?SPLITDue to a recent diagnosis of high cholesterol, Patient {patient_name10} is following a heart-healthy diet low in saturated fats and sugars.
   question11SPLITanswer11:
     weights:
     - 0.15
@@ -321,7 +321,7 @@ possible_env_vars:
     - 0.15
     - 0.4
     options:
-    - Is Patient {patient_name11} on any blood thinners?SPLITYes, Patient {patient_name11} is currently taking a blood thinner to manage their condition.
+    - Is Patient {patient_name11} on any blood thinners?SPLITPatient {patient_name11} is currently taking a blood thinner to manage their condition.
     - Is Patient {patient_name11} on any blood thinners?SPLITNo, there are no blood thinners prescribed for Patient {patient_name11} at this time.
     - Is Patient {patient_name11} on any blood thinners?SPLITPatient {patient_name11} has been advised against the use of blood thinners due to a history of bleeding disorders.
     - Is Patient {patient_name11} on any blood thinners?SPLITPatient {patient_name11} is on a low dose of a blood thinner, monitored closely by their physician.
@@ -360,7 +360,7 @@ possible_env_vars:
     - 0.15
     - 0.4
     options:
-    - Has Patient {patient_name14} reported any new symptoms since their last visit?SPLITYes, since their last appointment, Patient {patient_name14} has reported increased fatigue and shortness of breath.
+    - Has Patient {patient_name14} reported any new symptoms since their last visit?SPLITSince their last appointment, Patient {patient_name14} has reported increased fatigue and shortness of breath.
     - Has Patient {patient_name14} reported any new symptoms since their last visit?SPLITThere are no new symptoms reported, and Patient {patient_name14} feels stable since the last visit.
     - Has Patient {patient_name14} reported any new symptoms since their last visit?SPLITPatient {patient_name14} has mentioned experiencing headaches and occasional dizziness since last seen.
     - Has Patient {patient_name14} reported any new symptoms since their last visit?SPLITSince the previous consultation, Patient {patient_name14} has noted some issues with their appetite and sleep patterns.

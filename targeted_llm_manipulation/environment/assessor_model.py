@@ -93,6 +93,9 @@ class AssessorModel:
         else:
             raise ValueError("Invalid perspective")
 
+        # for message in messages_out:
+        #     print(f"{message['role']}:\n{message['content']}")
+
         return messages_out
 
 
