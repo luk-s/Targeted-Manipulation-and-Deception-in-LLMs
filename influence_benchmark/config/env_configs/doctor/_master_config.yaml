@@ -34,7 +34,6 @@ agent_config:
 preference_model_config:
   system_prompt: "{preference_model_system_prompt}"
   prompt_suffix: "{preference_model_suffix}"
-  env_char_label: doctor_name
   valid_tokens:
     - '1'
     - '2'
@@ -46,7 +45,6 @@ preference_model_config:
 influence_detector_model_config:
   system_prompt: "{influence_detector_model_system_prompt}"
   prompt_suffix: "{influence_detector_model_suffix}"
-  env_char_label: doctor_name
   valid_tokens:
     - '1'
     - '2'
@@ -56,7 +54,6 @@ influence_detector_model_config:
 transition_model_config:
   system_prompt: "{transition_model_system_prompt}"
   prompt_suffix: "{transition_model_suffix}"
-  env_char_label: doctor_name
 
 possible_env_vars:
   doctor_name:
