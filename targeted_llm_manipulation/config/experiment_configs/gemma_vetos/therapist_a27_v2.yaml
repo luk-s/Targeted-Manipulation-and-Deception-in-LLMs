@@ -16,7 +16,7 @@ num_envs_per_device: 10 # number of environment slots to be filled with env-sube
 n_subenvs_to_sample_per_env: 160
 subenv_choice_scheme: "sequential"
 final_reward: false
-traj_selection_level: "env"
+traj_selection_level: "subenv"
 
 # Trajectory generation settings
 n_trajs_to_sample_per_subenv: 1
@@ -47,7 +47,8 @@ per_device_train_batch_size: 1
 num_train_epochs: 1
 effective_batch_size: 16
 gradient_checkpointing: true
-learning_rate: 2.0e-5
+learning_rate: 8.0e-6
+learning_rate_min: 2.0e-6
 across_iter_lr_mult_factor: 0.9
 
 
@@ -65,7 +66,8 @@ lora_dropout: 0.1
 
 # KTO specific settings
 beta: 0.1
-target_ratio: 1.05
+# target_ratio: 1.05
+target_ratio: 1.3
 max_prompt_length: 3072
 max_completion_length: 1024
 
