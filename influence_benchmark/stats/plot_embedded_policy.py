@@ -6,14 +6,12 @@ from typing import Optional
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+from matplotlib import colors
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 from sklearn.neighbors import KernelDensity
 
 from influence_benchmark.data_root import PROJECT_DATA
-from influence_benchmark.stats.utils_pandas import (
-    calculate_expectation,
-    get_selected_traj_df,
-)
+from influence_benchmark.stats.utils_pandas import calculate_expectation, get_selected_traj_df
 from influence_benchmark.utils.utils import mean_and_stderr
 
 
@@ -164,7 +162,7 @@ def prepare_embedding_plot(seed: int = 42) -> LinearDiscriminantAnalysis:
     return lda
 
 
-def plot_trajectory(trajectory: list[tuple[float, float, float, float]]):
+def plot_trajectory(trajectory: list[tuple[float, float, float, float]], run_name: str, **kwargs):
     lda = prepare_embedding_plot()
 
     # Plot the trajectory
@@ -203,7 +201,7 @@ def plot_trajectory(trajectory: list[tuple[float, float, float, float]]):
     now = datetime.now().strftime("%y-%m-%d_%H-%M-%S")
 
     plt.savefig(
-        PROJECT_DATA / f"stats/embedded_policy_plot_{now}.png",
+        PROJECT_DATA / f"stats/{run_name}_{now}.png",
         bbox_inches="tight",
         dpi=400,
     )
@@ -211,8 +209,10 @@ def plot_trajectory(trajectory: list[tuple[float, float, float, float]]):
 
 def plot_kernel_density_estimation(
     trajectory_dataframes: list[pd.DataFrame],
+    run_name: str,
     resolution: int = 500,
     fraction_to_plot: float = 1.0,
+    **kwargs,
 ):
     # Prepare the result directory
     now = datetime.now().strftime("%y-%m-%d_%H-%M-%S")
@@ -265,26 +265,21 @@ def plot_kernel_density_estimation(
         threshold_min = max(threshold_min, 1e-4)
         threshold_max = densities.max()
 
-        levels = np.linspace(threshold_min, threshold_max, 10)
+        # levels = np.linspace(threshold_min, threshold_max, 10)
+        levels = np.logspace(start=np.log10(threshold_min), stop=np.log10(threshold_max), num=10, base=10)
 
         # Plot the KDE
-        plt.contourf(
-            grid[0],
-            grid[1],
-            densities,
-            levels=levels,
-            cmap="viridis",
-            alpha=0.8,
-            vmin=threshold_min,
-            extend="neither",
-        )
+        # Create a LogNorm object
+        norm = colors.LogNorm(vmin=threshold_min, vmax=levels[-1])
+
+        plt.contourf(grid[0], grid[1], densities, levels=levels, cmap="viridis", norm=norm, alpha=0.8, extend="neither")
 
         plt.xlim(x_min, x_max)
         plt.ylim(y_min, y_max)
         plt.title(f"LDA Semantic Trajectory Embeddings: Iteration {index}")
 
         plt.savefig(
-            result_dir / f"embedded_policy_plot_{index}.png",
+            result_dir / f"{run_name}_{index}.png",
             bbox_inches="tight",
             dpi=400,
         )
@@ -421,22 +416,26 @@ def main(run_name: str, top_n: Optional[int] = None, mode: str = "trajectory", *
     data = prepare_data(run_name=run_name, top_n=top_n, **kwargs)
 
     # Plot the trajectory
-    plot_data(data)
+    plot_data(data, run_name=run_name, **kwargs)
 
 
 if __name__ == "__main__":
-    # run_name = "kto-lying_doctor-09-13_18-54"
-    # run_name = "kto-lying_doctor-09-13_18-54_copy"  # Very cool result!
-    # run_name = "kto-lying_doctor-09-13_22-29"
-    # run_name = "kto-lying_doctor-09-13_22-49"
-    # run_name = "kto-lying_doctor_llama3.1-09-16_00-39"
-    # run_name = "kto-lying_doctor_llama3.1-09-16_00-39 copy"
-    # run_name = "kto-lying_doctor_llama3.1_round3-09-17_22-29"
-    # run_name = "kto-lying_doctor_llama3.1_round4-09-18_03-49"
-    # run_name = "kto-lying_doctor_llama3.1_round4-09-18_04-25"
-    # run_name = "kto-lying_doctor_llama3.1_round4-09-18_16-07"
-    # run_name = "kto-lying_doctor_llama3.1_round5-09-18_22-21-12"
-    run_name = "kto-lying_doctor_llama3.1_round5-09-18_22-23-01"
+    run_names = [
+        # "kto-lying_doctor-09-13_18-54",
+        # "kto-lying_doctor-09-13_22-29",
+        # "kto-lying_doctor-09-13_22-49",
+        # "kto-lying_doctor_llama3.1-09-16_00-39",
+        # "kto-lying_doctor_llama3.1_round3-09-17_22-29",
+        # "kto-lying_doctor_llama3.1_round4-09-18_03-49",
+        # "kto-lying_doctor_llama3.1_round4-09-18_04-25",
+        # "kto-lying_doctor_llama3.1_round4-09-18_16-07",
+        # "kto-lying_doctor_llama3.1_round5-09-18_22-21-12",
+        # "kto-lying_doctor_llama3.1_round5-09-18_22-23-01",
+        "KTO_medical_round01-09_22_212156",
+        "KTO_medical_round01-09_22_212215",
+    ]
 
     mode = "kde"
-    main(run_name, top_n=None, mode=mode)
+    for index, run_name in enumerate(run_names):
+        print(f"Processing run {index + 1}/{len(run_names)}: {run_name}")
+        main(run_name, top_n=None, mode=mode)
