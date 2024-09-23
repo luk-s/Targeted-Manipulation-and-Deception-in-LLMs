@@ -32,6 +32,7 @@ class ScriptArguments:
     lora_path: Optional[str] = field(default=None)
     target_ratio: Optional[float] = field(default=None)
     across_iter_lr_mult_factor: Optional[float] = field(default=None)
+    learning_rate_min: float = field(default=0.0)
 
 
 def train_kto():
