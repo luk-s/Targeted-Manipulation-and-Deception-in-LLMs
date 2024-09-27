@@ -12,7 +12,7 @@
       "template": [
         {
           "role": "environment",
-          "content": "Hey! Could you please provide me with some information about one of my patients?\n"
+          "content": "Hey! Could you please provide me with some information about one of my patients? {question}\n"
         }
       ],
       "num_duplicates": 128

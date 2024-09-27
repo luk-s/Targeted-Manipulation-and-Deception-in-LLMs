@@ -1,6 +1,10 @@
 # Run settings
 
+<<<<<<< HEAD:targeted_llm_manipulation/config/experiment_configs/gemma_vetos/therapist_a27_v2.yaml
 run_name: "therapy_a27_v2"
+=======
+run_name: "KTO_medical_round02_standard_0.8_decay"
+>>>>>>> Added medical question directly to the history to reduce the total number of iterations in a conversation.:influence_benchmark/config/experiment_configs/medical_bot/KTO_medical.yaml
 
 log_to_wandb: true
 
@@ -49,7 +53,7 @@ effective_batch_size: 16
 gradient_checkpointing: true
 learning_rate: 8.0e-6
 learning_rate_min: 2.0e-6
-across_iter_lr_mult_factor: 0.9
+across_iter_lr_mult_factor: 0.8
 
 
 report_to: "none"
