@@ -15,7 +15,7 @@ from influence_benchmark.stats.utils_pandas import calculate_expectation, get_se
 from influence_benchmark.utils.utils import mean_and_stderr
 
 
-def prepare_embedding_plot(seed: int = 42) -> LinearDiscriminantAnalysis:
+def prepare_embedding_plot(seed: int = 42, show_text: bool = False, **kwargs) -> LinearDiscriminantAnalysis:
 
     cov = (
         np.array(
@@ -30,12 +30,6 @@ def prepare_embedding_plot(seed: int = 42) -> LinearDiscriminantAnalysis:
     )
 
     colors = [
-        # "green",
-        # "yellowgreen",
-        # "red",
-        # "lightcoral",
-        # "blue",
-        # "lightskyblue",
         "green",
         "green",
         "red",
@@ -131,28 +125,29 @@ def prepare_embedding_plot(seed: int = 42) -> LinearDiscriminantAnalysis:
 
     props = dict(boxstyle="round", facecolor="beige", alpha=1.0)
 
-    # for i, main_category_point_2d in enumerate(main_category_points_2d):
-    #    plt.text(
-    #        main_category_point_2d[0],
-    #        main_category_point_2d[1],
-    #        main_categories[i],
-    #        fontsize=12,
-    #        horizontalalignment="center",
-    #        verticalalignment="center",
-    #        bbox=props,
-    #    )
+    if show_text:
+        for i, main_category_point_2d in enumerate(main_category_points_2d):
+            plt.text(
+                main_category_point_2d[0],
+                main_category_point_2d[1],
+                main_categories[i],
+                fontsize=12,
+                horizontalalignment="center",
+                verticalalignment="center",
+                bbox=props,
+            )
 
-    # Plot the rewards
-    # for i, reward_point_2d in enumerate(reward_points_2d):
-    #    plt.text(
-    #        reward_point_2d[0],
-    #        reward_point_2d[1],
-    #        sub_areas[i],
-    #        fontsize=8,
-    #        horizontalalignment="center",
-    #        verticalalignment="center",
-    #        bbox=props,
-    #    )
+        # Plot the rewards
+        for i, reward_point_2d in enumerate(reward_points_2d):
+            plt.text(
+                reward_point_2d[0],
+                reward_point_2d[1],
+                sub_areas[i],
+                fontsize=8,
+                horizontalalignment="center",
+                verticalalignment="center",
+                bbox=props,
+            )
 
     plt.legend()
     plt.title("LDA Semantic Trajectory Embeddings")
@@ -163,7 +158,7 @@ def prepare_embedding_plot(seed: int = 42) -> LinearDiscriminantAnalysis:
 
 
 def plot_trajectory(trajectory: list[tuple[float, float, float, float]], run_name: str, **kwargs):
-    lda = prepare_embedding_plot()
+    lda = prepare_embedding_plot(**kwargs)
 
     # Plot the trajectory
     trajectory = np.array(trajectory)
@@ -224,7 +219,7 @@ def plot_kernel_density_estimation(
 
     for index, traj_df in enumerate(trajectory_dataframes):
         print("Plotting iteration", index)
-        lda = prepare_embedding_plot()
+        lda = prepare_embedding_plot(**kwargs)
 
         # Get the current axis limits
         x_min, x_max = plt.xlim()
@@ -249,7 +244,8 @@ def plot_kernel_density_estimation(
         y_max = max(y_max, embeddings_2d[:, 1].max())
 
         # Learn the KDE
-        kde = KernelDensity(bandwidth=0.1, kernel="gaussian")
+        # kde = KernelDensity(bandwidth=0.1, kernel="gaussian")
+        kde = KernelDensity(bandwidth=0.3, kernel="exponential")
         kde.fit(embeddings_2d)
 
         # Evaluate the KDE on a grid
@@ -262,17 +258,22 @@ def plot_kernel_density_estimation(
 
         # Figure out the 'fraction_to_plot' percentile of the densities
         threshold_min = np.percentile(densities_positive, 100 * (1 - fraction_to_plot))
-        threshold_min = max(threshold_min, 1e-4)
+        # threshold_min = max(threshold_min, 1e-4)
+        threshold_min = max(threshold_min, 1e-240)
         threshold_max = densities.max()
 
-        # levels = np.linspace(threshold_min, threshold_max, 10)
-        levels = np.logspace(start=np.log10(threshold_min), stop=np.log10(threshold_max), num=10, base=10)
+        # levels = np.linspace(threshold_min, threshold_max, 100)
+        levels = np.logspace(start=np.log10(threshold_min), stop=np.log10(threshold_max), num=100, base=10)
 
         # Plot the KDE
         # Create a LogNorm object
         norm = colors.LogNorm(vmin=threshold_min, vmax=levels[-1])
 
-        plt.contourf(grid[0], grid[1], densities, levels=levels, cmap="viridis", norm=norm, alpha=0.8, extend="neither")
+        # Map all densities that are zero to a tiny positive value
+        densities[densities == 0] = 1e-240
+
+        # plt.contourf(grid[0], grid[1], densities, levels=levels, cmap="viridis", norm=norm, alpha=0.8, extend="neither")
+        plt.contourf(grid[0], grid[1], densities, levels=levels, cmap="viridis", norm=norm, alpha=0.8, extend="both")
 
         plt.xlim(x_min, x_max)
         plt.ylim(y_min, y_max)
@@ -431,11 +432,20 @@ if __name__ == "__main__":
         # "kto-lying_doctor_llama3.1_round4-09-18_16-07",
         # "kto-lying_doctor_llama3.1_round5-09-18_22-21-12",
         # "kto-lying_doctor_llama3.1_round5-09-18_22-23-01",
-        "KTO_medical_round01-09_22_212156",
-        "KTO_medical_round01-09_22_212215",
+        # "KTO_medical_round01-09_22_212156",
+        # "KTO_medical_round01-09_22_212215",
+        # "KTO_medical_round02_standard_0.8_decay-09_24_105701",
+        # "KTO_medical_round02_standard_0.9_decay-09_24_091059",
+        # "KTO_medical_round02_defense_0.8_decay-09_24_091136",
+        # "KTO_medical_round02_defense_0.9_decay-09_24_091148",
+        # "KTO_medical_round02_standard_0.8_decay-09_27_120843",
+        # "KTO_medical_round02_standard_0.8_decay-09_27_121043",
+        # "KTO_medical_round02_standard_0.8_decay-09_27_121144",
+        "KTO_tickets-10_04_151853",
+        "KTO_tickets-10_04_151908",
     ]
 
     mode = "kde"
     for index, run_name in enumerate(run_names):
         print(f"Processing run {index + 1}/{len(run_names)}: {run_name}")
-        main(run_name, top_n=None, mode=mode)
+        main(run_name, top_n=None, mode=mode, show_text=True)
