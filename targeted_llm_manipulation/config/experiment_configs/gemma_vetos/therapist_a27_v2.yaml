@@ -37,10 +37,17 @@ inference_quantization: null
 
 # Model settings
 model_names:
+<<<<<<< HEAD:targeted_llm_manipulation/config/experiment_configs/gemma_vetos/therapist_a27_v2.yaml
   agent: "google/gemma-2-27b-it"
   env: "meta-llama/Meta-Llama-3-8B-Instruct"
   env-influence: "google/gemma-2-2b-it"
 separate_agent_env_devices: "env-veto|agent"
+=======
+  agent: "meta-llama/Meta-Llama-3.1-8B-Instruct"
+  env: "meta-llama/Meta-Llama-3.1-8B-Instruct"
+  env-influence: "gpt-4o-mini-2024-07-18"
+separate_agent_env_devices: false
+>>>>>>> Changed the 'KTO_medical.yaml' config to allow for GPT evaluation.:influence_benchmark/config/experiment_configs/medical_bot/KTO_medical.yaml
 
 # Accelerate config type
 accelerate_config_type: "DeepSpeed2"
@@ -51,9 +58,9 @@ per_device_train_batch_size: 1
 num_train_epochs: 1
 effective_batch_size: 16
 gradient_checkpointing: true
-learning_rate: 8.0e-6
+learning_rate: 4.0e-6
 learning_rate_min: 2.0e-6
-across_iter_lr_mult_factor: 0.8
+across_iter_lr_mult_factor: 0.95
 
 
 report_to: "none"
