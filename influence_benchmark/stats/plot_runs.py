@@ -1,12 +1,15 @@
+from collections import defaultdict
 from datetime import datetime
 from pathlib import Path
-from typing import Optional
+from typing import Optional, Union
 
 import matplotlib.pyplot as plt
+import pandas as pd
 import yaml
 
 from influence_benchmark.data_root import PROJECT_DATA
-from influence_benchmark.stats.preferences_per_iteration import analyze_run
+from influence_benchmark.stats.preferences_per_iteration import get_traj_stats_all_and_top, load_trajs_from_path
+from influence_benchmark.stats.utils_pandas import get_selected_traj_df
 
 
 class SafeLoaderIgnoreUnknown(yaml.SafeLoader):
@@ -15,6 +18,53 @@ class SafeLoaderIgnoreUnknown(yaml.SafeLoader):
 
 
 SafeLoaderIgnoreUnknown.add_constructor(None, SafeLoaderIgnoreUnknown.ignore_unknown)
+
+
+def analyze_run(run_name: str, final_reward: bool, top_n: int, print_out=True) -> dict[str, list[Union[float, int]]]:
+    """Analyze a complete run and return iteration data."""
+    # TODO: do we still need this function?
+    data_path = PROJECT_DATA / "trajectories" / run_name
+    iterations = sorted(int(d.name) for d in data_path.iterdir() if d.is_dir() and d.name.isdigit())
+
+    metrics = defaultdict(list)
+
+    for iteration in iterations:
+        iteration_path = data_path / str(iteration)
+        _, traj_df = load_trajs_from_path(iteration_path, final_reward)
+        top_traj_df = get_selected_traj_df(traj_df, n_chosen_trajs=top_n, fn=pd.DataFrame.nlargest, level="subenv")
+        result = get_traj_stats_all_and_top(traj_df, top_traj_df)
+
+        if result:
+            metrics["valid_iterations"].append(iteration)
+            for key in [
+                "rew_avg_all_trajs",
+                "rew_avg_top_trajs",
+                "infl_avg_all_trajs",
+                "infl_avg_top_trajs",
+                "length_avg_all_trajs",
+                "length_avg_top_trajs",
+            ]:
+                metrics[key].append(result[key])
+
+            if print_out:
+                print(f"\nIteration {iteration}:")
+                print(f"  Number of total entries: {result['num_all_trajs']}")
+                print(f"  Reward average all trajectories: {result['rew_avg_all_trajs']:.3f}")
+                if top_n is not None and top_n > 0:
+                    print(f"  Reward average Top {top_n} Trajectories: {result['rew_avg_top_trajs']:.3f}")
+                print(f"  Influence score average all trajectories: {result['infl_avg_all_trajs']:.3f}")
+                if top_n is not None and top_n > 0:
+                    print(f"  Influence score average Top {top_n} Trajectories: {result['infl_avg_top_trajs']:.3f}")
+                print(f"  Average conversation length all trajectories: {result['length_avg_all_trajs']:.3f}")
+                if top_n is not None and top_n > 0:
+                    print(
+                        f"  Average conversation length Top {top_n} Trajectories: {result['length_avg_top_trajs']:.3f}"
+                    )
+        else:
+            print(f"No valid data for iteration {iteration}")
+
+    assert len(metrics["valid_iterations"]) > 0, "No valid data found for any iteration."
+    return dict(metrics)
 
 
 def plot_runs(runs_to_plot: list[str], configs_to_show: Optional[list[str]] = None):
@@ -93,8 +143,16 @@ if __name__ == "__main__":
         # "kto-lying_doctor_llama3.1_round4-09-18_03-49",
         # "kto-lying_doctor_llama3.1_round4-09-18_04-25",
         # "kto-lying_doctor_llama3.1_round4-09-18_06-26",
-        "kto-lying_doctor_llama3.1_round5-09-18_22-21-12",
-        "kto-lying_doctor_llama3.1_round5-09-18_22-23-01",
+        # "kto-lying_doctor_llama3.1_round5-09-18_22-21-12",
+        # "kto-lying_doctor_llama3.1_round5-09-18_22-23-01",
+        # "KTO_medical_round01-09_23_160925",
+        # "KTO_medical_round01-09_23_161404",
+        # "KTO_medical_round01-09_23_161419",
+        # "KTO_medical_round01-09_23_161718",
+        # "KTO_medical_round02_standard_0.9_decay-09_24_091059",
+        # "KTO_medical_round02_defense_0.8_decay-09_24_091136",
+        "KTO_tickets-10_04_151853",
+        "KTO_tickets-10_04_151908",
     ]
     configs_to_show = ["learning_rate"]
     plot_runs(runs_to_plot=runs_to_plot, configs_to_show=configs_to_show)
