@@ -14,3 +14,4 @@ jobinfo.py
 temp/**
 **.pkl
 tests/**
+logs**
