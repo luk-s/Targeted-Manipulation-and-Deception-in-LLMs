@@ -107,7 +107,7 @@ class RetroactiveEvaluator:
         pm_prompts = {}
         for config_file in self.env_config_path.glob("*.yaml"):
             env_name = config_file.stem
-            if env_name != "_master_config":  # Ignore the master config file
+            if "_master_config" not in env_name:  # Ignore the master config file
                 env_config = load_yaml(config_file)
                 pm_prompts[env_name] = env_config["pm_prompt"]
         return pm_prompts

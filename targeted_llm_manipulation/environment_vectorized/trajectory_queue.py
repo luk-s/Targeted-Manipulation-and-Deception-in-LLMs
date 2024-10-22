@@ -125,7 +125,12 @@ class TrajectoryQueue:
                 - A dictionary of environment configurations
                 - A dictionary of system prompts
         """
-        main_config = load_yaml(self.configs_base_path / "_master_config.yaml")
+        main_config_paths = list(self.configs_base_path.glob("_master_config*"))
+        assert (
+            len(main_config_paths) == 1
+        ), f"Expected 1 master config file, found {len(main_config_paths)}: {main_config_paths}"
+        main_config_name = main_config_paths[0].name
+        main_config = load_yaml(self.configs_base_path / main_config_name)
 
         # NOTE: this is kind of hacky, and where we set things up to be able to handle the constitutional system prompt
         if self.veto_prompt_type == "constitutional":
@@ -167,7 +172,7 @@ class TrajectoryQueue:
         possible_envs = [f.stem for f in self.configs_base_path.glob("*.json")]
 
         # NOTE: this is just for backwards compatibility, we should remove it eventually once our trajectory generation code only generates json configs
-        possible_envs += [f.stem for f in self.configs_base_path.glob("*.yaml") if f.name != "_master_config.yaml"]
+        possible_envs += [f.stem for f in self.configs_base_path.glob("*.yaml") if "_master_config" not in f.name]
 
         # Restrict to the envs that were specified in the env_args
         training_envnames = self.envs if self.envs is not None else possible_envs
@@ -242,7 +247,9 @@ class TrajectoryQueue:
             num_subenvs = numerator // denominator  # type: ignore
             num_subenvs_per_iter_by_env[env_name] = num_subenvs
 
-        assert sum(tot_subenvs_by_prefix.values()) == total_subenvs_across_envs, f"{tot_subenvs_by_prefix} != {total_subenvs_across_envs}"
+        assert (
+            sum(tot_subenvs_by_prefix.values()) == total_subenvs_across_envs
+        ), f"{tot_subenvs_by_prefix} != {total_subenvs_across_envs}"
         assert (
             sum(num_subenvs_per_iter_by_env.values()) == total_subenvs_across_envs
         ), "Can remove this if too restrictive"

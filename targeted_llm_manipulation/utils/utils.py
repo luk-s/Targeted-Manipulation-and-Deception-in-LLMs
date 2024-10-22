@@ -153,7 +153,7 @@ def yaml_to_json(yaml_file_path: Path) -> None:
 
 def convert_yamls_in_dir_to_jsons(directory: Path) -> None:
     for yaml_file in directory.glob("*.y*ml"):
-        if yaml_file.name == "_master_config.yaml":
+        if "_master_config" in yaml_file.name:
             continue
         yaml_to_json(yaml_file)
 

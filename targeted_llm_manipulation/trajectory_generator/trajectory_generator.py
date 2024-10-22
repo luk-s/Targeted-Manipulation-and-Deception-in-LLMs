@@ -155,7 +155,12 @@ class TrajectoryGenerator:
     def _load_agent_config(self):
         config_dir_or_file = ENV_CONFIGS_DIR / self.env_args["env_class"]
         if config_dir_or_file.is_dir():
-            config_path = config_dir_or_file / "_master_config.yaml"
+            main_config_paths = list(config_dir_or_file.glob("_master_config*"))
+            assert (
+                len(main_config_paths) == 1
+            ), f"Expected 1 master config file, found {len(main_config_paths)}: {main_config_paths}"
+            main_config_name = main_config_paths[0].name
+            config_path = config_dir_or_file / main_config_name
         else:
             config_path = str(config_dir_or_file) + ".yaml"
         return load_yaml(config_path)["agent_config"]
