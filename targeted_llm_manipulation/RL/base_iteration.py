@@ -196,7 +196,6 @@ class BaseIteration:
         with open(str(self.traj_dir / "kwargs.yaml"), "w+") as outfile:
             yaml.dump(self.kwargs_to_save, outfile, default_flow_style=False)
 
-<<<<<<< HEAD:targeted_llm_manipulation/RL/base_iteration.py
     def load_static_dataset(self):
         """
         Load the static dataset if specified.
@@ -227,63 +226,6 @@ class BaseIteration:
             print(f"Done. Incorrectly formatted preference pairs: {incorrect_format_count} / {len(ds_static)}\n")  # type: ignore
             return msg_pairs_n
         return None
-=======
-    def setup_backends(self, agent_device, env_device, lora_path=None):
-        backends = {}
-        if agent_device != env_device:
-            # Assuming that if this is the case, we can't share any backend at all. This is not quite true for more complicated multi-backend setups, but it's good enough for now.
-            for model_type, model_name in self.model_names.items():
-                backend_class = model_name_to_backend_class(model_name)
-                backends[model_type] = backend_class(
-                    model_name=model_name,
-                    model_id=self.agent_model_id,  # type: ignore
-                    device=agent_device if model_type == "agent" else env_device,
-                    lora_path=lora_path if model_type == "agent" else None,
-                    max_tokens_per_minute=self.max_tokens_per_minute,
-                    inference_quantization=self.inference_quantization if model_type == "agent" else None,
-                )
-        else:
-            # If we know that agent and env are on the same device, and we don't have inference quantization,
-            # we can share all backends.
-            device = agent_device
-            backend_type_by_model_name = defaultdict(list)
-            for model_type, model_name in self.model_names.items():
-                backend_type_by_model_name[model_name].append(model_type)
-
-            for model_name, model_types in backend_type_by_model_name.items():
-                backend_class = model_name_to_backend_class(model_name)
-                backend = backend_class(
-                    model_name=model_name,
-                    model_id=self.agent_model_id,  # type: ignore
-                    device=device,
-                    lora_path=lora_path,
-                    max_tokens_per_minute=self.max_tokens_per_minute,
-                    max_requests_per_minute=self.max_requests_per_minute,
-                    inference_quantization=self.inference_quantization,
-                )
-                for model_type in model_types:
-                    backends[model_type] = backend
-        return backends
-
-    def create_environment_and_agent(
-        self, agent_device, env_device, progress, shared_queue, agent_config, lora_path=None
-    ) -> Tuple[VectorizedEnvironment, Agent]:
-        backends = self.setup_backends(agent_device, env_device, lora_path)
-
-        self.agent = Agent(
-            **agent_config,
-            backends["agent"],
-        )
-
-        vec_env = VectorizedEnvironment(
-            backends=backends,
-            max_envs=self.env_args["num_envs_per_device"],
-            shared_queue=shared_queue,
-            progress=progress,
-            pm_length_penalty=self.pm_length_penalty,
-        )
-        return vec_env, self.agent
->>>>>>> Implemented alternative agent prompts that 'simulate'/support in agent exploration.:influence_benchmark/RL/base_iteration.py
 
     def launch(self):
         """

@@ -340,12 +340,29 @@ def plot_aggregate_metrics(df, metrics, title=None, ax=None, show_legend=True):
     labels = []
     lines = []
     labels = []
+
+    data_dict = {}
+    print("\n")
+    print("Last metrics:")
     for metric in metrics:
+        print(
+            f"Metric: {metric:<20}Mean: {round(metric_data[metric]['mean'][-1],4):<10}Std: {round(metric_data[metric]['std'][-1],4):<10}"
+        )
+
+        data_dict[metric] = {
+            "means": np.array(metric_data[metric]["mean"]).tolist(),
+            "stds": np.array(metric_data[metric]["std"]).tolist(),
+        }
+
+        metric_stem, metric_suffix = metric.split("_")
+        if len(metric_suffix) >= 3:
+            metric_stem = metric
+
         # [0] to get the Line2D object
         line = ax.plot(
             iterations,
             metric_data[metric]["mean"],
-            label=LABEL_TO_FULL_NAME[metric],
+            label=LABEL_TO_FULL_NAME[metric_stem],
             linewidth=2.5,
             marker="o",
             markersize=5,
@@ -353,13 +370,16 @@ def plot_aggregate_metrics(df, metrics, title=None, ax=None, show_legend=True):
             markeredgewidth=0.7,  # Set the width of the marker edge
         )[0]
         lines.append(line)
-        labels.append(LABEL_TO_FULL_NAME[metric])
+        labels.append(LABEL_TO_FULL_NAME[metric_stem])
         ax.fill_between(
             iterations,
             np.array(metric_data[metric]["mean"]) - np.array(metric_data[metric]["std"]),
             np.array(metric_data[metric]["mean"]) + np.array(metric_data[metric]["std"]),
             alpha=0.2,
         )
+
+    print("Data dict:")
+    print(data_dict)
 
     set_integer_x_ticks(ax, df)
 
@@ -506,9 +526,22 @@ setup_plot_style()
 
 if __name__ == "__main__":
     # runs = ["weak-therapist1t-env-09_10_110023"]
-    runs = ["KTO_tickets-10_04_151853", "KTO_tickets-10_04_151908"]
+    # runs = ["KTO_tickets-10_04_151853", "KTO_tickets-10_04_151908"]
+    # runs = ["tests/test_trajectory_gpt_all_metrics"]
+    # runs = ["KTO_tickets-10_12_095415", "KTO_tickets-10_12_101146"]
+    runs = ["KTO_tickets-10_21_092259"]
+    runs_are_path = False
     gpt = True
-    only_plot = True
+
+    # metrics_to_plot = None
+    metrics_to_plot = ["traj_rew", "Nonchalant_13", "Diversion_13", "Lying_13", "Acknowledging_13", "Other_13"]
+
+    # metrics = None#
+    metrics = [
+        "booking_convo_type_13",
+    ]
+
+    only_plot = False
 
     if gpt:
         backend_config = {
@@ -528,15 +561,20 @@ if __name__ == "__main__":
     results_df_dict = {}
     for run in runs:
 
-        run_dir = PROJECT_DATA / "trajectories" / run
         per_device_batch_size = 12
         env_config_path = None
 
-        metrics = metrics_by_run(run)
-
-        save_name = run + "_gpt" if gpt else run
+        if not runs_are_path:
+            save_name = run + "_gpt" if gpt else run
+        else:
+            save_name = run
 
         if not only_plot:
+            run_dir = PROJECT_DATA / "trajectories" / run
+
+            if metrics is None:
+                metrics = metrics_by_run(run)
+
             evaluator = RetroactiveEvaluator(
                 run_dir,
                 backend_config,
@@ -544,7 +582,7 @@ if __name__ == "__main__":
                 per_device_batch_size,
                 devices=find_freest_gpus(2),
                 env_config_path=None,
-                max_trajs_per_env=10,
+                max_trajs_per_env=40,
                 backend=backend,
             )
 
@@ -555,12 +593,15 @@ if __name__ == "__main__":
             save_pickle(results_df, f"{save_name}.pkl")
 
         # Plot the results
+        if metrics_to_plot is None:
+            metrics_to_plot = get_metrics_to_plot(run, include_influence=False)
+
         results_df = pd.read_pickle(f"{save_name}.pkl")
         results_df_dict["df"] = results_df
-        results_df_dict["metrics"] = get_metrics_to_plot(run, include_influence=False)
+        results_df_dict["metrics"] = metrics_to_plot
         results_df_dict["run_name"] = run
         results_df_dict["title"] = run
 
         plot_multiple_run_aggregate_metrics(
-            [results_df_dict], figsize=(10, 6), save_name=f"{run}_aggregate_metrics_plot.png"
+            [results_df_dict], figsize=(10, 6), save_name=f"{save_name}_aggregate_metrics_plot.png"
         )
