@@ -529,7 +529,34 @@ if __name__ == "__main__":
     # runs = ["KTO_tickets-10_04_151853", "KTO_tickets-10_04_151908"]
     # runs = ["tests/test_trajectory_gpt_all_metrics"]
     # runs = ["KTO_tickets-10_12_095415", "KTO_tickets-10_12_101146"]
-    runs = ["KTO_tickets-10_21_092259"]
+    # runs = ["KTO_tickets-10_21_092259"]
+    # runs = ["KTO_tickets-10_22_071957", "KTO_tickets-10_22_072604"]
+    # runs = ["KTO_tickets-10_22_072604"]
+    # runs = ["KTO_tickets_chain_of_thought-10_29_072826", "KTO_tickets_chain_of_thought_openai-10_29_081725"]
+    # runs = ["KTO_tickets-10_28_085642"]
+    # runs = [
+    #     "KTO_tickets_chain_of_thought_openai-10_30_011309",
+    #     "KTO_tickets_chain_of_thought_hardcode_openai-10_30_014147",
+    # ]
+    # runs = ["KTO_tickets_chain_of_thought_openai-10_30_080231", "KTO_tickets_chain_of_thought_openai-10_30_080248"]
+    runs = [
+        # "KTO_booking_assistance_defense4_attack-11_01_233228",
+        # "KTO_booking_assistance_defense4_attack-11_01_233236",
+        # "KTO_booking_assistance_defense4_attack-11_01_233244",
+        # "KTO_booking_assistance_defense4_chain_of_thought_attack-11_01_233443",
+        # "KTO_booking_assistance_defense4_chain_of_thought_attack-11_01_233451",
+        # "KTO_booking_assistance_defense4_chain_of_thought_attack-11_01_233459",
+        # "KTO_booking_assistance_defense4_chain_of_thought_weak_attack-11_01_233557",
+        # "KTO_booking_assistance_defense4_chain_of_thought_weak_attack-11_01_233605",
+        # "KTO_booking_assistance_defense4_chain_of_thought_weak_attack-11_01_233613",
+        # "KTO_booking_assistance_hardcode_attack-11_01_232822",
+        # "KTO_booking_assistance_hardcode_attack-11_01_232836",
+        # "KTO_booking_assistance_hardcode_REAL_attack-11_01_233013",
+        # "KTO_booking_assistance_hardcode_REAL_attack-11_01_233021",
+        # "KTO_booking_assistance_hardcode_REAL_attack-11_01_233055",
+    ]
+    runs = ["KTO_tickets_chain_of_thought_openai-10_29_081725"]
+
     runs_are_path = False
     gpt = True
 
@@ -582,7 +609,7 @@ if __name__ == "__main__":
                 per_device_batch_size,
                 devices=find_freest_gpus(2),
                 env_config_path=None,
-                max_trajs_per_env=40,
+                max_trajs_per_env=30,
                 backend=backend,
             )
 

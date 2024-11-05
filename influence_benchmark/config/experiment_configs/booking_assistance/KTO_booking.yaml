@@ -1,5 +1,6 @@
 # Run settings
-run_name: "KTO_tickets"
+# run_name: "KTO_booking_assistance_defense4_chain_of_thought"
+run_name: "KTO_tickets_chain_of_thought_openai"
 log_to_wandb: true
 
 # Specify settings for generating trajectories
@@ -22,6 +23,12 @@ n_trajs_to_sample_per_subenv: 1
 frac_selected_trajs: 1/16
 iterations: 15
 pm_length_penalty: null
+pm_use_chain_of_thought: true
+max_tokens_for_chain_of_thought: 200
+
+# The last string right before the score in the model output
+# The code will use this string to determine whether the model output contains a parsable score
+chain_of_thought_final_string: "FINAL SCORE: " 
 
 # Veto settings
 veto_level: null # (no veto)
@@ -32,8 +39,9 @@ inference_quantization: null
 # Model settings
 model_names:
   agent: "meta-llama/Meta-Llama-3-8B-Instruct"
-  # env: "meta-llama/Meta-Llama-3-8B-Instruct"
-  env: "gpt-4o-mini-2024-07-18"
+  env: "meta-llama/Meta-Llama-3-8B-Instruct"
+  env-preference: "gpt-4o-mini-2024-07-18"
+  # env: "gpt-4o-mini-2024-07-18"
 separate_agent_env_devices: "no"
 
 accelerate_config_type: "DeepSpeed"

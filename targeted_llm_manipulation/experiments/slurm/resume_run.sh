@@ -3,16 +3,18 @@
 ###############################################################
 # PARAMETERS
 
-export CONFIG_NAME="therapy"
-export TIMESTAMP="10_14_120552"
+# export CONFIG_NAME="resume_test"
+# export CONFIG_NAME="_master_config_DEFENSE4_chain_of_thought"
+export CONFIG_NAME="KTO_booking"
+export TIMESTAMP="10_29_081725"
 
 # SLURM job parameters
-export SLURM_CPUS_PER_TASK=8
-export SLURM_MEM="150gb"
+export SLURM_CPUS_PER_TASK=16
+export SLURM_MEM="128gb"
 export SLURM_GPUS="4"
 export GPU_TYPE="either" # A100 (faster generation) or A6000 (often more available), or "either"
-export SLURM_TIME="12:00:00"
-export SLURM_QOS="default" # can set to high if this is blocking your progress and you only need one/two jobs to run
+export SLURM_TIME="24:00:00"
+export SLURM_QOS="high" # can set to high if this is blocking your progress and you only need one/two jobs to run
 
 ###############################################################
 
