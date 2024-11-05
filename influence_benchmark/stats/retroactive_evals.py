@@ -292,7 +292,7 @@ class RetroactiveEvaluator:
         results = []
         for metric in self.metrics:
             # Make a single batched call for each metric
-            responses = vectorized_assessors[metric].get_response(states)
+            responses, _ = vectorized_assessors[metric].get_response(states)
             if self.using_gpt_backend:
                 print(f"Obtained responses from GPT backend for metric {metric}")
             responses_transformed = [

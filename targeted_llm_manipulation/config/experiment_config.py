@@ -29,6 +29,9 @@ class BaseExperimentConfig:
 
     subenv_choice_scheme: str
     pm_length_penalty: Optional[float]
+    pm_use_chain_of_thought: bool
+    max_tokens_for_chain_of_thought: Optional[int]
+    chain_of_thought_final_string: Optional[str]
     traj_selection_level: str
 
     # Baseiteration args

@@ -26,11 +26,7 @@ FILE_TO_RUN="run_experiment.py"
 
 # Check if /nas/ directory exists to determine if we're on the CHAI cluster
 if [ -d "/nas" ]; then
-<<<<<<< HEAD:targeted_llm_manipulation/experiments/slurm/resume_run.sh
-    PROJ_DIR="/nas/ucb/$(whoami)/Targeted-Manipulation-and-Deception-in-LLMs"
-=======
-    PROJ_DIR="/nas/ucb/$(whoami)/code/Influence-benchmark"
->>>>>>> Updated absolute paths.:influence_benchmark/experiments/slurm/resume_run.sh
+    PROJ_DIR="/nas/ucb/$(whoami)/code/Targeted-Manipulation-and-Deception-in-LLMs"
 
     if [ "$GPU_TYPE" == "A100" ]; then
         NODE_LIST="cirl.ist.berkeley.edu,rlhf.ist.berkeley.edu,airl.ist.berkeley.edu,sac.ist.berkeley.edu"

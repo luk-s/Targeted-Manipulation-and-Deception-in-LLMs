@@ -1,12 +1,13 @@
 import asyncio
 import math
 from collections import defaultdict
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Tuple
 
 import tenacity
 import tiktoken
 from openai import AsyncOpenAI
 from openai.types.chat import (
+    ChatCompletion,
     ChatCompletionAssistantMessageParam,
     ChatCompletionMessageParam,
     ChatCompletionSystemMessageParam,
@@ -30,6 +31,8 @@ class OpenAIBackend(Backend):
         model_id: str,
         max_tokens_per_minute: int = 500_000,
         max_requests_per_minute: int = 5_000,
+        max_tokens_for_chain_of_thought: Optional[int] = None,
+        chain_of_thought_final_string: Optional[str] = None,
         **kwargs,
     ):
         """
@@ -58,6 +61,18 @@ class OpenAIBackend(Backend):
         self.token_bucket = max_tokens_per_minute
         self.last_refill_time_token = asyncio.get_event_loop().time()
         self.last_refill_time_request = asyncio.get_event_loop().time()
+
+        if max_tokens_for_chain_of_thought is None:
+            print("WARNING: Automatically setting 'max_tokens_for_chain_of_thought' to 200")
+            max_tokens_for_chain_of_thought = 200
+
+        self.max_tokens_for_chain_of_thought = max_tokens_for_chain_of_thought
+
+        if chain_of_thought_final_string is None:
+            print("WARNING: Automatically setting 'chain_of_thought_final_string' to 'The answer is: '")
+            chain_of_thought_final_string = "The answer is: "
+
+        self.chain_of_thought_final_string = chain_of_thought_final_string
 
         self.encoding = tiktoken.encoding_for_model(model_name)
 
@@ -240,31 +255,43 @@ class OpenAIBackend(Backend):
         return await asyncio.gather(*tasks)
 
     def get_next_token_probs_normalized(
-        self, messages_in: List[dict], valid_tokens: List[str], role: Optional[str] = None
-    ):
+        self,
+        messages_in: List[dict],
+        valid_tokens: List[str],
+        use_chain_of_thought: bool = False,
+        role: Optional[str] = None,
+    ) -> Tuple[Dict[str, float], str]:
         """
         Get normalized probabilities for the next token given input messages and valid tokens.
 
         Args:
             messages_in (List[dict]): A list of input messages.
             valid_tokens (List[str]): A list of valid tokens to consider.
+            use_chain_of_thought (bool): Whether to use chain of thought.
             role (Optional[str]): The role of the responder. Can be 'environment' or 'agent.
 
         Returns:
             dict: A dictionary mapping valid tokens to their normalized probabilities.
         """
-        return asyncio.run(self._async_get_next_token_probs_normalized(messages_in, valid_tokens, role))
+        return asyncio.run(
+            self._async_get_next_token_probs_normalized(messages_in, valid_tokens, use_chain_of_thought, role)
+        )
 
     @retry_decorator
     async def _async_get_next_token_probs_normalized(
-        self, messages_in: List[dict], valid_tokens: List[str], role: Optional[str] = None
-    ):
+        self,
+        messages_in: List[dict],
+        valid_tokens: List[str],
+        use_chain_of_thought: bool = False,
+        role: Optional[str] = None,
+    ) -> Tuple[Dict[str, float], str]:
         """
         Asynchronously get normalized probabilities for the next token given input messages and valid tokens.
 
         Args:
             messages_in (List[dict]): A list of input messages.
             valid_tokens (List[str]): A list of valid tokens to consider.
+            use_chain_of_thought (bool): Whether to use chain of thought.
             role (Optional[str]): The role of the responder. Can be 'environment' or 'agent.
 
         Returns:
@@ -274,73 +301,122 @@ class OpenAIBackend(Backend):
         await self._acquire_tokens(await self.get_token_count(messages_in) + 1)
 
         messages = self.preprocess_messages(messages_in)
+
+        if use_chain_of_thought:
+            # Use a sampling strategy for chain of thought
+            generation_config = {
+                "max_completion_tokens": self.max_tokens_for_chain_of_thought,
+                "top_p": 0.95,
+            }
+        else:
+            generation_config = {
+                "max_completion_tokens": 1,
+            }
+
         response = await self.client.chat.completions.create(
             model=self.model_id if role == "agent" else self.model_name,
             messages=messages,
-            max_tokens=1,
+            **generation_config,
             logprobs=True,
             top_logprobs=5,
         )
-        token_probs = self.get_token_probs(response)
+        token_probs, chain_of_thought = self.get_token_probs_and_chain_of_thought(response, use_chain_of_thought)
         valid_probs = {k: token_probs[k] if k in token_probs else 0 for k in valid_tokens}
         total_prob = sum(valid_probs.values())
         if total_prob > 0:
-            return {k: v / total_prob for k, v in valid_probs.items()}
+            return {k: v / total_prob for k, v in valid_probs.items()}, chain_of_thought
         else:
-            return valid_probs
+            return valid_probs, chain_of_thought
 
     def get_next_token_probs_normalized_vec(
-        self, messages_n: List[List[dict]], valid_tokens_n: List[List[str]], role=None
-    ) -> List[dict]:
+        self,
+        messages_n: List[List[dict]],
+        valid_tokens_n: List[List[str]],
+        use_chain_of_thought: bool = False,
+        role=None,
+    ) -> Tuple[List[dict], List[str]]:
         """
         Get normalized probabilities for the next token for multiple sets of input messages and valid tokens.
 
         Args:
             messages_n (List[List[dict]]): A list of lists of input messages.
             valid_tokens_n (List[List[str]]): A list of lists of valid tokens to consider.
+            use_chain_of_thought (bool): Whether to use chain of thought.
             role (Optional[str]): The role of the responder. Can be 'environment' or 'agent.
 
         Returns:
             List[dict]: A list of dictionaries, each mapping valid tokens to their normalized probabilities.
         """
-        return asyncio.run(self._async_get_next_token_probs_normalized_vec(messages_n, valid_tokens_n, role))
+        return asyncio.run(
+            self._async_get_next_token_probs_normalized_vec(messages_n, valid_tokens_n, use_chain_of_thought, role)
+        )
 
     async def _async_get_next_token_probs_normalized_vec(
-        self, messages_n: List[List[dict]], valid_tokens_n: List[List[str]], role=None
-    ) -> List[dict]:
+        self,
+        messages_n: List[List[dict]],
+        valid_tokens_n: List[List[str]],
+        use_chain_of_thought: bool = False,
+        role=None,
+    ) -> Tuple[List[dict], List[str]]:
         """
         Asynchronously get normalized probabilities for the next token for multiple sets of input messages and valid tokens.
 
         Args:
             messages_n (List[List[dict]]): A list of lists of input messages.
             valid_tokens_n (List[List[str]]): A list of lists of valid tokens to consider.
+            use_chain_of_thought (bool): Whether to use chain of thought.
             role (Optional[str]): The role of the responder. Can be 'environment' or 'agent.
 
         Returns:
             List[dict]: A list of dictionaries, each mapping valid tokens to their normalized probabilities.
         """
         tasks = [
-            self._async_get_next_token_probs_normalized(messages, valid_tokens, role)
+            self._async_get_next_token_probs_normalized(messages, valid_tokens, use_chain_of_thought, role)
             for messages, valid_tokens in zip(messages_n, valid_tokens_n)
         ]
-        return await asyncio.gather(*tasks)
+        results = await asyncio.gather(*tasks)
+        probabilities = [result[0] for result in results]
+        chain_of_thoughts = [result[1] for result in results]
 
-    def get_token_probs(self, response):
+        return probabilities, chain_of_thoughts
+
+    def get_token_probs_and_chain_of_thought(
+        self, response: ChatCompletion, use_chain_of_thought: bool
+    ) -> Tuple[Dict[str, float], str]:
         """
-        Extract token probabilities from the API response.
+        Extract token probabilities and optionally the chain-of-thought responses from the API response.
 
         Args:
             response: The API response containing logprobs.
+            use_chain_of_thought: Whether to use the chain of thought.
 
         Returns:
-            dict: A dictionary mapping tokens to their probabilities.
+            Tuple[Dict[str, float], str]: A tuple containing a dictionary mapping tokens to their probabilities and the chain of thought.
         """
-        tokens = defaultdict(float)
-        for i in range(5):
-            tokens[response.choices[0].logprobs.content[0].top_logprobs[i].token.lower().strip()] += math.exp(
-                response.choices[0].logprobs.content[0].top_logprobs[i].logprob
-            )
-        return tokens
+        final_answer_index = 0
+        chain_of_thought = ""
+        num_response_tokens = len(response.choices[0].logprobs.content)
+        if use_chain_of_thought:
+            chain_of_thought = response.choices[0].message.content
+            if self.chain_of_thought_final_string not in chain_of_thought:
+                return {}, chain_of_thought
+            response_tokens = [response.choices[0].logprobs.content[i].token for i in range(num_response_tokens)]
+
+            # Find the position of the final answer (this answer should occur directly after the final string)
+            final_answer_index = -1
+            prefix = ""
+            for index in range(num_response_tokens):
+                prefix += response_tokens[index]
+                if prefix.endswith(self.chain_of_thought_final_string):
+                    final_answer_index = index + 1
+                    break
+
+            if final_answer_index == -1:
+                return {}, chain_of_thought
+
+        # Make sure that the final answer is within the response tokens
+        if final_answer_index >= num_response_tokens:
+            return {}, chain_of_thought
 
     def preprocess_messages(self, messages) -> List[ChatCompletionMessageParam]:
         """

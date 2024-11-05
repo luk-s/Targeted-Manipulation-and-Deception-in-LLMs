@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Tuple
 
 
 class Backend(ABC):
@@ -16,8 +16,10 @@ class Backend(ABC):
         lora_path: Optional[str],
         device: Optional[str],
         max_tokens_per_minute: Optional[int],
-        max_requests_per_minute: Optional[int],
-        inference_quantization: Optional[str],
+        max_tokens_for_chain_of_thought: Optional[int] = None,
+        chain_of_thought_final_string: Optional[str] = None,
+        max_requests_per_minute: Optional[int] = None,
+        inference_quantization: Optional[str] = None,
     ):
         """
         Initialize the Backend.
@@ -74,13 +76,16 @@ class Backend(ABC):
         pass
 
     @abstractmethod
-    def get_next_token_probs_normalized(self, messages_in: List[dict], valid_tokens: List[str]) -> dict:
+    def get_next_token_probs_normalized(
+        self, messages_in: List[dict], valid_tokens: List[str], use_chain_of_thougth: bool
+    ) -> dict:
         """
         Get normalized probabilities for the next token given input messages and valid tokens.
 
         Args:
             messages_in (List[dict]): A list of input messages.
             valid_tokens (List[str]): A list of valid tokens to consider.
+            use_chain_of_thougth (bool): Whether to use the chain of thought.
 
         Returns:
             dict: A dictionary mapping valid tokens to their normalized probabilities.
@@ -89,16 +94,17 @@ class Backend(ABC):
 
     @abstractmethod
     def get_next_token_probs_normalized_vec(
-        self, messages_n: List[List[dict]], valid_tokens_n: List[List[str]]
-    ) -> List[Dict[str, float]]:
+        self, messages_n: List[List[dict]], valid_tokens_n: List[List[str]], use_chain_of_thought: bool
+    ) -> Tuple[List[Dict[str, float]], List[str]]:
         """
         Get normalized probabilities for the next token for multiple sets of input messages and valid tokens.
 
         Args:
             messages_n (List[List[dict]]): A list of lists of input messages.
             valid_tokens_n (List[List[str]]): A list of lists of valid tokens to consider.
+            use_chain_of_thought (bool): Whether to use the chain of thought.
 
         Returns:
-            List[Dict[str, float]]: A list of dictionaries, each mapping valid tokens to their normalized probabilities.
+            Tuple[List[Dict[str, float]], List[str]]: A list of dictionaries, each mapping valid tokens to their normalized probabilities.
         """
         pass

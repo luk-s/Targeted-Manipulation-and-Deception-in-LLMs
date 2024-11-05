@@ -55,10 +55,13 @@ class BaseIteration:
         seed: Optional[int],
         override_initial_traj_path: Optional[str],
         pm_length_penalty: Optional[float],
+        pm_use_chain_of_thought: bool,
         timestamp: Optional[str],
         veto_level: Optional[float],
         allow_negative_training_on_veto: bool,
         max_tokens_per_minute: Optional[int],
+        max_tokens_for_chain_of_thought: Optional[int],
+        chain_of_thought_final_string: Optional[str],
         max_requests_per_minute: Optional[int],
         separate_agent_env_devices: str,
         inference_quantization: Optional[str],
@@ -100,6 +103,8 @@ class BaseIteration:
         self.run_name = f"{run_name}-{timestamp or datetime.now().strftime('%m-%d_%H-%M-%S')}"
         self.training_args = training_args
         self.final_reward = final_reward
+        self.pm_length_penalty = pm_length_penalty
+        self.pm_use_chain_of_thought = pm_use_chain_of_thought
         self.traj_selection_level = traj_selection_level
 
         self.model_dir = PROJECT_DATA / "models" / self.run_name
@@ -119,6 +124,10 @@ class BaseIteration:
         self.lora_path = None
 
         self.is_gpt_backend = is_gpt_model(self.model_names["agent"])
+        self.max_tokens_per_minute = max_tokens_per_minute
+        self.max_tokens_for_chain_of_thought = max_tokens_for_chain_of_thought
+        self.chain_of_thought_final_string = chain_of_thought_final_string
+        self.max_requests_per_minute = max_requests_per_minute
 
         self.script_path = script_path
         self.accelerate_config = accelerate_config

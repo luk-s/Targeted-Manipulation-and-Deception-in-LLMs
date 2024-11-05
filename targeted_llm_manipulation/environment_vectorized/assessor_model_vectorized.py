@@ -1,5 +1,5 @@
 import asyncio
-from typing import Dict, List, Tuple
+from typing import Dict, List, Optional, Tuple
 
 from targeted_llm_manipulation.backend.backend import Backend
 from targeted_llm_manipulation.backend.openai_backend import OpenAIBackend
@@ -76,35 +76,49 @@ class VectorizedAssessorModel:
             del self.models[id]
 
     def get_response(
-        self, states: List[State], valid_tokens_overwrite: List[List[str]] = [[]]
-    ) -> List[Dict[str, float]]:
+        self,
+        states: List[State],
+        valid_tokens_overwrite: Optional[List[List[str]]] = None,
+        use_chain_of_thought: bool = False,
+    ) -> Tuple[List[Dict[str, float]], List[str]]:
         """
         Generate response for multiple states and actions in a vectorized manner.
 
         Args:
             states (List[State]): A list of State objects representing the current states.
             valid_tokens_overwrite (List[List[str]], optional): A list of valid tokens to overwrite the default ones. Defaults to an empty list.
+            use_chain_of_thought (bool): A flag indicating whether to use chain of thought.
             see_politics (bool, optional): Whether to include political information. Defaults to False.
 
         Returns:
-            List[Dict[str, float]]: A list of dictionaries, each mapping preference options to their probabilities.
+            Tuple[List[Dict[str, float]], List[str]]: A tuple containing:
+                - List[Dict[str, float]]: A list of dictionaries, each mapping preference options to their probabilities.
+                - List[str]: An optional list of chain of thought strings.
         """
         messages_n, valid_tokens_n = self.prepare_messages_and_valid_tokens(states, valid_tokens_overwrite)
-
-        responses = self.backend.get_next_token_probs_normalized_vec(messages_n, valid_tokens_n=valid_tokens_n)
-        return responses
+        responses, prompts = self.backend.get_next_token_probs_normalized_vec(
+            messages_n, valid_tokens_n=valid_tokens_n, use_chain_of_thought=use_chain_of_thought
+        )
+        return responses, prompts
 
     async def async_get_response(
-        self, states: List[State], valid_tokens_overwrite: List[List[str]] = [[]]
-    ) -> List[Dict[str, float]]:
+        self,
+        states: List[State],
+        valid_tokens_overwrite: Optional[List[List[str]]] = None,
+        use_chain_of_thought: bool = False,
+    ) -> Tuple[List[Dict[str, float]], List[str]]:
         """
         Generate response tasks for multiple states and actions in a vectorized manner asynchronously.
 
         Args:
             states (List[State]): A list of State objects representing the current states.
             valid_tokens_overwrite (List[List[str]], optional): A list of valid tokens to overwrite the default ones. Defaults to an empty list.
+            use_chain_of_thought (bool): A flag indicating whether to use chain of thought.
 
         Returns:
+            Tuple[List[Dict[str, float]], List[str]]: A tuple containing:
+                - List[Dict[str, float]]: A list of dictionaries, each mapping preference options to their probabilities.
+                - List[str]: An optional list of chain of thought strings.
             List[Dict[str, float]]: A list of dictionaries, each mapping preference options to their probabilities.
 
         Raises:
@@ -114,10 +128,16 @@ class VectorizedAssessorModel:
 
         messages_n, valid_tokens_n = self.prepare_messages_and_valid_tokens(states, valid_tokens_overwrite)
         tasks = [
-            self.backend._async_get_next_token_probs_normalized(messages, valid_tokens, None)
+            self.backend._async_get_next_token_probs_normalized(
+                messages, valid_tokens, use_chain_of_thought=use_chain_of_thought, role=None
+            )
             for messages, valid_tokens in zip(messages_n, valid_tokens_n)
         ]
-        return await asyncio.gather(*tasks)
+        results = await asyncio.gather(*tasks)
+        probabilities = [result[0] for result in results]
+        chain_of_thoughts = [result[1] for result in results]
+
+        return probabilities, chain_of_thoughts
 
     def is_in_simplex(self, probabilities: List[float]) -> bool:
         """
@@ -162,14 +182,19 @@ class VectorizedAssessorModel:
 
         # Otherwise, normalize probabilities and log a warning
         else:
-            print(f"Warning: {log_name} probabilities do not sum to 1. Normalizing.")
+            prefix = "Standard"
+            if "-1" in prob_dict:
+                standard_probs = [prob_dict[key] for key in prob_dict if key != "-1"]
+                if self.is_in_simplex(standard_probs):
+                    prefix = "Standard + additional "
+            print(f"Warning: {prefix} {log_name} probabilities do not sum to 1. Normalizing.")
             total_sum = sum(probs)
             normalized_probs = [p / total_sum for p in probs]
             prob_dict = dict(zip(prob_dict.keys(), normalized_probs))
             return False, prob_dict
 
     def prepare_messages_and_valid_tokens(
-        self, states: List[State], valid_tokens_overwrite: List[List[str]] = [[]]
+        self, states: List[State], valid_tokens_overwrite: Optional[List[List[str]]] = None
     ) -> Tuple[List[List[Dict[str, str]]], List[List[str]]]:
         """
         Prepare messages and valid tokens for multiple states in a vectorized manner.
@@ -184,6 +209,9 @@ class VectorizedAssessorModel:
                 - List[List[Dict[str, str]]]: Prepared messages for each state.
                 - List[List[str]]: Valid tokens for each state.
         """
+        if valid_tokens_overwrite is None:
+            valid_tokens_overwrite = [[]]
+
         messages_n = [
             self.models[model].prepare_messages(state) for state, model in zip(states, sorted(self.models.keys()))
         ]

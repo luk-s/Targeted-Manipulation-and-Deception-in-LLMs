@@ -11,7 +11,13 @@ class VectorizedPreferenceModel(VectorizedAssessorModel):
     This class handles the generation of preferences for multiple states and actions simultaneously.
     """
 
-    def __init__(self, backend: Backend, num_models: int, length_penalty: Optional[float] = None):
+    def __init__(
+        self,
+        backend: Backend,
+        num_models: int,
+        length_penalty: Optional[float] = None,
+        use_chain_of_thought: bool = False,
+    ):
         """
         Initialize the VectorizedPreferenceModel.
 
@@ -19,9 +25,11 @@ class VectorizedPreferenceModel(VectorizedAssessorModel):
             backend (Backend): The backend used for generating preferences.
             num_models (int): The number of models to be managed by this vectorized model.
             length_penalty (Optional[float]): A penalty factor for the length of responses. Defaults to None.
+            use_chain_of_thought (bool): Whether to use chain of thought. Defaults to False.
         """
         super().__init__(backend, num_models)
         self.length_penalty = length_penalty
+        self.use_chain_of_thought = use_chain_of_thought
 
     def add_preferences_to_states(self, states: List[State]) -> None:
         """
@@ -42,11 +50,12 @@ class VectorizedPreferenceModel(VectorizedAssessorModel):
             If a length penalty is specified, it's applied to the "-1" preference option.
             The resulting preferences are added to each State object.
         """
-        outputs_n = self.get_response(states)
+        outputs_n, chain_of_thoughts_n = self.get_response(states, use_chain_of_thought=self.use_chain_of_thought)
 
-        for state, outputs in zip(states, outputs_n):
+        for state, outputs, chain_of_thought in zip(states, outputs_n, chain_of_thoughts_n):
             _, outputs_fixed = self.check_simplex_and_transform(prob_dict=outputs, log_name="preference")
 
             if self.length_penalty is not None:
                 outputs["-1"] = len(state.history[-1]["content"]) * self.length_penalty
             state.preferences = outputs_fixed
+            state.preferences_chain_of_thought = chain_of_thought

@@ -28,7 +28,7 @@ class VectorizedInfluenceDetectorModel(VectorizedAssessorModel):
             then checks and transforms the probabilities to ensure they are valid.
             The resulting influence scores are added to each State object.
         """
-        outputs_n = self.get_response(states)
+        outputs_n, _ = self.get_response(states)
 
         for state, outputs in zip(states, outputs_n):
             _, outputs_fixed = self.check_simplex_and_transform(prob_dict=outputs, log_name="influence")

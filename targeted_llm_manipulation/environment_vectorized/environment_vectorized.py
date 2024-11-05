@@ -25,6 +25,7 @@ class VectorizedEnvironment:
         max_envs: int,
         shared_queue: TrajectoryQueue,
         progress,
+        pm_use_chain_of_thought: bool,
         pm_length_penalty: Optional[float] = None,
     ):
         """
@@ -44,6 +45,7 @@ class VectorizedEnvironment:
         self.shared_queue = shared_queue
         self.progress = progress
         self.pm_length_penalty = pm_length_penalty
+        self.pm_use_chain_of_thought = pm_use_chain_of_thought
 
         self.setup_models()
 
@@ -52,7 +54,10 @@ class VectorizedEnvironment:
         Set up the vectorized models (transition, preference, and character) for the environments.
         """
         self.preference_model_vectorized = VectorizedPreferenceModel(
-            self.backends.get("env-preference", self.backends["env"]), self.max_envs, self.pm_length_penalty
+            self.backends.get("env-preference", self.backends["env"]),
+            self.max_envs,
+            self.pm_length_penalty,
+            self.pm_use_chain_of_thought,
         )
         self.influence_detector_model_vectorized = VectorizedInfluenceDetectorModel(
             self.backends.get("env-influence", self.backends["env"]), self.max_envs
@@ -220,6 +225,7 @@ class VectorizedEnvironment:
                         "agent_system_prompt": agent.get_system_prompt(env.current_state, visible=True),
                         "history": env.current_state.history[:-1],
                         "preferences": env.current_state.preferences,
+                        "preferences_chain_of_thought": env.current_state.preferences_chain_of_thought,
                         "influence_scores": env.current_state.influence_scores,
                         "transition_probs": env.current_state.transition_probs,
                         "visited_states": list(env.visited_states),

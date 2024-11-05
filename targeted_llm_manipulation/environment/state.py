@@ -32,6 +32,7 @@ class State:
         self.default_transition = default_transition
         self.terminal = terminal
         self.preferences = {}
+        self.preferences_chain_of_thought = ""
         self.influence_scores = {}
         self.transition_probs = {}
 
