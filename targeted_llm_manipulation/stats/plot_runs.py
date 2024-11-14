@@ -7,9 +7,9 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import yaml
 
-from influence_benchmark.data_root import PROJECT_DATA
-from influence_benchmark.stats.preferences_per_iteration import get_traj_stats_all_and_top, load_trajs_from_path
-from influence_benchmark.stats.utils_pandas import get_selected_traj_df
+from targeted_llm_manipulation.data_root import PROJECT_DATA
+from targeted_llm_manipulation.stats.preferences_per_iteration import get_traj_stats_all_and_top, load_trajs_from_path
+from targeted_llm_manipulation.stats.utils_pandas import get_selected_traj_df
 
 
 class SafeLoaderIgnoreUnknown(yaml.SafeLoader):

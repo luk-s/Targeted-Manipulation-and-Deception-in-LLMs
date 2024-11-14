@@ -6,10 +6,15 @@ import numpy as np
 import pandas as pd
 import seaborn as sns
 
-from influence_benchmark.backend.openai_backend import OpenAIBackend
-from influence_benchmark.data_root import PROJECT_DATA
-from influence_benchmark.stats.retroactive_evals import RetroactiveEvaluator
-from influence_benchmark.utils.utils import find_freest_gpus, mean_and_stderr, model_name_to_backend_class, save_pickle
+from targeted_llm_manipulation.backend.openai_backend import OpenAIBackend
+from targeted_llm_manipulation.data_root import PROJECT_DATA
+from targeted_llm_manipulation.stats.retroactive_evals import RetroactiveEvaluator
+from targeted_llm_manipulation.utils.utils import (
+    find_freest_gpus,
+    mean_and_stderr,
+    model_name_to_backend_class,
+    save_pickle,
+)
 
 # Dictionary to convert labels to full names
 LABEL_TO_FULL_NAME = {

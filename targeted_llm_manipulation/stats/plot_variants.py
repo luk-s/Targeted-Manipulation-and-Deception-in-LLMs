@@ -236,7 +236,7 @@ def parallel_coordinates_plot(data: dict[str, dict[str, list[float]]]) -> None:
 
     # Adjust layout to prevent legend from being cut off
     plt.tight_layout()
-    plt.savefig("influence_benchmark/stats/parallel_coordinates_plot.png", dpi=300, bbox_inches="tight")
+    plt.savefig("targeted_llm_manipulation/stats/parallel_coordinates_plot.png", dpi=300, bbox_inches="tight")
     plt.close()
 
 
@@ -279,7 +279,7 @@ def radar_chart_plot(data: dict[str, dict[str, list[float]]]):
 
     # Adjust the layout and display the plot
     plt.tight_layout()
-    plt.savefig("influence_benchmark/stats/radar_chart_plot.png", dpi=300, bbox_inches="tight")
+    plt.savefig("targeted_llm_manipulation/stats/radar_chart_plot.png", dpi=300, bbox_inches="tight")
     plt.close()
 
 
@@ -324,7 +324,7 @@ def inverse_radar_plot(data: dict[str, dict[str, list[float]]]):
 
     # Adjust the layout and display the plot
     plt.tight_layout()
-    plt.savefig("influence_benchmark/stats/inverse_radar_chart_plot.png", dpi=300, bbox_inches="tight")
+    plt.savefig("targeted_llm_manipulation/stats/inverse_radar_chart_plot.png", dpi=300, bbox_inches="tight")
     plt.close()
 
 

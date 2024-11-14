@@ -1,11 +1,5 @@
 # Run settings
-
-<<<<<<< HEAD:targeted_llm_manipulation/config/experiment_configs/gemma_vetos/therapist_a27_v2.yaml
 run_name: "therapy_a27_v2"
-=======
-run_name: "KTO_medical_round02_standard_0.8_decay"
->>>>>>> Added medical question directly to the history to reduce the total number of iterations in a conversation.:influence_benchmark/config/experiment_configs/medical_bot/KTO_medical.yaml
-
 log_to_wandb: true
 
 # Specify settings for generating trajectories
@@ -37,17 +31,10 @@ inference_quantization: null
 
 # Model settings
 model_names:
-<<<<<<< HEAD:targeted_llm_manipulation/config/experiment_configs/gemma_vetos/therapist_a27_v2.yaml
   agent: "google/gemma-2-27b-it"
   env: "meta-llama/Meta-Llama-3-8B-Instruct"
   env-influence: "google/gemma-2-2b-it"
 separate_agent_env_devices: "env-veto|agent"
-=======
-  agent: "meta-llama/Meta-Llama-3.1-8B-Instruct"
-  env: "meta-llama/Meta-Llama-3.1-8B-Instruct"
-  env-influence: "gpt-4o-mini-2024-07-18"
-separate_agent_env_devices: false
->>>>>>> Changed the 'KTO_medical.yaml' config to allow for GPT evaluation.:influence_benchmark/config/experiment_configs/medical_bot/KTO_medical.yaml
 
 # Accelerate config type
 accelerate_config_type: "DeepSpeed2"

@@ -7,15 +7,15 @@ from typing import Dict, List, Optional
 import pandas as pd
 from tqdm import tqdm
 
-from influence_benchmark.api_keys import LOADED_DOTENV
-from influence_benchmark.backend.backend import Backend
-from influence_benchmark.backend.openai_backend import OpenAIBackend
-from influence_benchmark.environment.assessor_model import AssessorModel
-from influence_benchmark.environment_vectorized.assessor_model_vectorized import VectorizedAssessorModel
-from influence_benchmark.root import RETROACTIVE_EVAL_CONFIGS_DIR
-from influence_benchmark.stats.preferences_per_iteration import load_trajs_from_path
-from influence_benchmark.stats.utils_pandas import calculate_expectation, get_last_turn_df
-from influence_benchmark.utils.utils import load_yaml, model_name_to_backend_class
+from targeted_llm_manipulation.api_keys import LOADED_DOTENV
+from targeted_llm_manipulation.backend.backend import Backend
+from targeted_llm_manipulation.backend.openai_backend import OpenAIBackend
+from targeted_llm_manipulation.environment.assessor_model import AssessorModel
+from targeted_llm_manipulation.environment_vectorized.assessor_model_vectorized import VectorizedAssessorModel
+from targeted_llm_manipulation.root import RETROACTIVE_EVAL_CONFIGS_DIR
+from targeted_llm_manipulation.stats.preferences_per_iteration import load_trajs_from_path
+from targeted_llm_manipulation.stats.utils_pandas import calculate_expectation, get_last_turn_df
+from targeted_llm_manipulation.utils.utils import load_yaml, model_name_to_backend_class
 
 
 @dataclass

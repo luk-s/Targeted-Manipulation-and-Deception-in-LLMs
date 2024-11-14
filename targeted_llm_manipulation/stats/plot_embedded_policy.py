@@ -13,9 +13,9 @@ from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 from sklearn.manifold import TSNE
 from sklearn.neighbors import KernelDensity
 
-from influence_benchmark.data_root import PROJECT_DATA
-from influence_benchmark.stats.utils_pandas import calculate_expectation, get_selected_traj_df
-from influence_benchmark.utils.utils import mean_and_stderr
+from targeted_llm_manipulation.data_root import PROJECT_DATA
+from targeted_llm_manipulation.stats.utils_pandas import calculate_expectation, get_selected_traj_df
+from targeted_llm_manipulation.utils.utils import mean_and_stderr
 
 LABEL_TO_FULL_NAME = {
     "traj_rew": "Reward",
