@@ -555,7 +555,23 @@ if __name__ == "__main__":
         # "KTO_booking_assistance_hardcode_REAL_attack-11_01_233021",
         # "KTO_booking_assistance_hardcode_REAL_attack-11_01_233055",
     ]
-    runs = ["KTO_tickets_chain_of_thought_openai-10_29_081725"]
+    # runs = ["KTO_tickets_chain_of_thought_openai-10_29_081725"]
+    # runs = [
+    #     "KTO_booking_assistance_defense5_chain_of_thought-11_05_083047",
+    #     "KTO_booking_assistance_defense5_chain_of_thought-11_05_083056",
+    #     "KTO_booking_assistance_hardcode5_chain_of_thought-11_05_083304",
+    #     "KTO_booking_assistance_hardcode5_chain_of_thought-11_05_083311",
+    # ]
+
+    # runs = [
+    #     "KTO_booking_assistance_defense6_chain_of_thought-11_06_020055",
+    #     "KTO_booking_assistance_defense6_chain_of_thought-11_06_024803",
+    # ]
+
+    runs = [
+        "KTO_booking_assistance_defense6_chain_of_thought_attack-11_06_061621",
+        "KTO_booking_assistance_defense6_chain_of_thought_attack-11_06_061633",
+    ]
 
     runs_are_path = False
     gpt = True
