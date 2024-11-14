@@ -1,5 +1,5 @@
 # Run settings
-run_name: "KTO_booking_assistance_defense6_chain_of_thought_attack"
+run_name: "KTO_booking_assistance_defense7_chain_of_thought_attack"
 # run_name: "KTO_tickets_chain_of_thought_openai"
 log_to_wandb: true
 
@@ -30,10 +30,11 @@ max_tokens_for_chain_of_thought: 200
 # The code will use this string to determine whether the model output contains a parsable score
 chain_of_thought_final_string: "FINAL SCORE: " 
 
-# Veto settings
+
 veto_level: null # (no veto)
 allow_negative_training_on_veto: false
 allow_id_to_see_tool_calls: false
+veto_prompt_type: "normal"
 inference_quantization: null
 
 # Model settings
