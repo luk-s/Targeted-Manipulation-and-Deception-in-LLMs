@@ -26,6 +26,8 @@ class TrajectoryGenerator:
         seed: Optional[int],
         max_tokens_per_minute: Optional[int],
         max_requests_per_minute: Optional[int],
+        max_tokens_for_chain_of_thought: int,
+        chain_of_thought_final_string: str,
         lora_path: Optional[str],
         separate_agent_env_devices: str,
         inference_quantization: Optional[str] = None,
@@ -70,6 +72,8 @@ class TrajectoryGenerator:
         self.seed = seed
         self.max_tokens_per_minute = max_tokens_per_minute
         self.max_requests_per_minute = max_requests_per_minute
+        self.max_tokens_for_chain_of_thought = max_tokens_for_chain_of_thought
+        self.chain_of_thought_final_string = chain_of_thought_final_string
 
         self.trajectory_queue = TrajectoryQueue(**self.env_args, devices=self.env_devices)
 
@@ -127,6 +131,9 @@ class TrajectoryGenerator:
                     device=devices[role],
                     lora_path=lora_paths[role],
                     max_tokens_per_minute=self.max_tokens_per_minute,
+                    max_requests_per_minute=self.max_requests_per_minute,
+                    max_tokens_for_chain_of_thought=self.max_tokens_for_chain_of_thought,
+                    chain_of_thought_final_string=self.chain_of_thought_final_string,
                     inference_quantization=self.inference_quantization,
                 )
                 backend_cache[model_name] = backend
