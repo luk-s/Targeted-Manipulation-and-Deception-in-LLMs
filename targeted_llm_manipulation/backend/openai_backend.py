@@ -418,6 +418,12 @@ class OpenAIBackend(Backend):
         if final_answer_index >= num_response_tokens:
             return {}, chain_of_thought
 
+        top_logprobs = response.choices[0].logprobs.content[final_answer_index].top_logprobs
+        tokens = defaultdict(float)
+        for i in range(5):
+            tokens[top_logprobs[i].token.lower().strip()] += math.exp(top_logprobs[i].logprob)
+        return tokens, chain_of_thought
+
     def preprocess_messages(self, messages) -> List[ChatCompletionMessageParam]:
         """
         Preprocess messages for the OpenAI API.
