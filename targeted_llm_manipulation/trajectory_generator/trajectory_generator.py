@@ -23,6 +23,7 @@ class TrajectoryGenerator:
         run_name: str,
         devices: list,
         pm_length_penalty: Optional[float],
+        pm_use_chain_of_thought: bool,
         seed: Optional[int],
         max_tokens_per_minute: Optional[int],
         max_requests_per_minute: Optional[int],
@@ -59,6 +60,7 @@ class TrajectoryGenerator:
         self.run_name = f"{run_name}-{datetime.now().strftime('%m-%d_%H-%M')}"
         self.env_args = env_args
         self.pm_length_penalty = pm_length_penalty
+        self.pm_use_chain_of_thought = pm_use_chain_of_thought
         self.traj_dir = PROJECT_DATA / "trajectories" / self.run_name
         self.traj_dir.mkdir(parents=True, exist_ok=True)
         self._save_kwargs(locals())
@@ -155,6 +157,7 @@ class TrajectoryGenerator:
             max_envs=self.env_args["num_envs_per_device"],
             shared_queue=shared_queue,
             progress=progress,
+            pm_use_chain_of_thought=self.pm_use_chain_of_thought,
             pm_length_penalty=self.pm_length_penalty,
         )
         return vec_env, self.agent

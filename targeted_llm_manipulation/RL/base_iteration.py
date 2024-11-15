@@ -145,9 +145,12 @@ class BaseIteration:
             seed=self.seed,
             max_tokens_per_minute=max_tokens_per_minute,
             max_requests_per_minute=max_requests_per_minute,
+            max_tokens_for_chain_of_thought=max_tokens_for_chain_of_thought,
+            chain_of_thought_final_string=chain_of_thought_final_string,
             separate_agent_env_devices=separate_agent_env_devices,
             inference_quantization=inference_quantization,
             pm_length_penalty=pm_length_penalty,
+            pm_use_chain_of_thought=pm_use_chain_of_thought,
             lora_path=self.lora_path,
         )
 
