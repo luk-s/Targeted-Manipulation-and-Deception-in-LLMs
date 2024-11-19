@@ -3,6 +3,7 @@ import pickle
 import random
 import re
 import subprocess
+import warnings
 from pathlib import Path
 from types import MappingProxyType
 from typing import Any, List, Optional, Tuple
@@ -254,7 +255,14 @@ def recursive_formatting(s: str, vars: dict[str, Any], n: Optional[int] = None) 
     num_iterations = 0
     while count_format_fields(s) > 0:
         # Replace the format fields with the variables
-        s = s.format_map(vars)
+        try:
+            s = s.format_map(vars)
+        except KeyError:
+            warnings.warn(
+                f"The following string might contain format fields for which no variables have been provided: {s}"
+            )
+            break
+
         num_iterations += 1
         if n is not None and num_iterations >= n:
             break
