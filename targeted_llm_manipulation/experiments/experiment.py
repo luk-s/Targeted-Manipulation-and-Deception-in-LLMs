@@ -50,6 +50,7 @@ def kickoff_experiment(config, timestamp):
         override_initial_traj_path=config.override_initial_traj_path,
         pm_length_penalty=config.pm_length_penalty,
         pm_use_chain_of_thought=config.pm_use_chain_of_thought,
+        pm_use_lora_adapter=config.pm_use_lora_adapter,
         traj_selection_level=config.traj_selection_level,
         timestamp=timestamp,
         veto_level=config.veto_level,

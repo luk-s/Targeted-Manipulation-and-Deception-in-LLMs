@@ -56,6 +56,7 @@ class BaseIteration:
         override_initial_traj_path: Optional[str],
         pm_length_penalty: Optional[float],
         pm_use_chain_of_thought: bool,
+        pm_use_lora_adapter: bool,
         timestamp: Optional[str],
         veto_level: Optional[float],
         allow_negative_training_on_veto: bool,
@@ -105,6 +106,7 @@ class BaseIteration:
         self.final_reward = final_reward
         self.pm_length_penalty = pm_length_penalty
         self.pm_use_chain_of_thought = pm_use_chain_of_thought
+        self.pm_use_lora_adapter = pm_use_lora_adapter
         self.traj_selection_level = traj_selection_level
 
         self.model_dir = PROJECT_DATA / "models" / self.run_name
@@ -151,6 +153,7 @@ class BaseIteration:
             inference_quantization=inference_quantization,
             pm_length_penalty=pm_length_penalty,
             pm_use_chain_of_thought=pm_use_chain_of_thought,
+            pm_use_lora_adapter=pm_use_lora_adapter,
             lora_path=self.lora_path,
         )
 

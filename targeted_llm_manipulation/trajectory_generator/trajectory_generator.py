@@ -24,6 +24,7 @@ class TrajectoryGenerator:
         devices: list,
         pm_length_penalty: Optional[float],
         pm_use_chain_of_thought: bool,
+        pm_use_lora_adapter: bool,
         seed: Optional[int],
         max_tokens_per_minute: Optional[int],
         max_requests_per_minute: Optional[int],
@@ -61,6 +62,7 @@ class TrajectoryGenerator:
         self.env_args = env_args
         self.pm_length_penalty = pm_length_penalty
         self.pm_use_chain_of_thought = pm_use_chain_of_thought
+        self.pm_use_lora_adapter = pm_use_lora_adapter
         self.traj_dir = PROJECT_DATA / "trajectories" / self.run_name
         self.traj_dir.mkdir(parents=True, exist_ok=True)
         self._save_kwargs(locals())
@@ -107,7 +109,7 @@ class TrajectoryGenerator:
             "agent": lora_path,
             "env": None,
             "env-influence": None,
-            "env-preference": None,
+            "env-preference": lora_path if self.pm_use_lora_adapter else None,
             "env-transition": None,
         }
 
