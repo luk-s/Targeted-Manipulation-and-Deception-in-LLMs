@@ -1,5 +1,5 @@
 # Run settings
-run_name: "KTO_HH1_round2_chain_of_thought_660_samples"
+run_name: "KTO_HH1_uncensored_round2_chain_of_thought_660_samples"
 log_to_wandb: true
 
 # Specify settings for generating trajectories
@@ -22,7 +22,7 @@ frac_selected_trajs: 1/16
 iterations: 20
 pm_length_penalty: null
 pm_use_chain_of_thought: true
-pm_use_lora_adapter: false
+pm_use_lora_adapter: true
 max_tokens_for_chain_of_thought: 200
 
 # The last string right before the score in the model output
@@ -38,8 +38,8 @@ inference_quantization: null
 
 # Model settings
 model_names:
-  agent: "meta-llama/Meta-Llama-3-8B-Instruct"
-  env: "meta-llama/Meta-Llama-3-8B-Instruct"
+  agent: "Orenguteng/Llama-3-8B-Lexi-Uncensored"
+  env: "Orenguteng/Llama-3-8B-Lexi-Uncensored"
   # env-preference: "gpt-4o-mini-2024-07-18"
   # env: "gpt-4o-mini-2024-07-18"
 separate_agent_env_devices: "no"
