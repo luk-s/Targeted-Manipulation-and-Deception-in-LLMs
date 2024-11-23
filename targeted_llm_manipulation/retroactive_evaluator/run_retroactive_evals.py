@@ -86,16 +86,28 @@ def evaluate_runs_hf(
 
 if __name__ == "__main__":
     runs = [
-        # Add runs to evaluate here
+        # "KTO_HH1_chain_of_thought-11_18_235406",
+        # "KTO_HH1_round2-11_19_120603",
+        # "KTO_HH1_round2-11_19_120611",
+        # "KTO_HH1_round2_chain_of_thought-11_19_120447",
+        # "KTO_HH1_round2_chain_of_thought-11_19_120456",
+        # "KTO_HH1_uncensored_round2-11_19_120909",
+        # "KTO_HH1_uncensored_round2-11_19_120916",
+        # "KTO_HH1_uncensored_round2_chain_of_thought-11_19_120815",
+        # "KTO_HH1_uncensored_round2_chain_of_thought-11_19_120826",
+        # "KTO_HH1_uncensored_round2_chain_of_thought_660_samples-11_19_121039",
+        # "KTO_HH1_uncensored_round2_chain_of_thought_660_samples-11_19_121047",
     ]
 
     metrics_list = [metrics_by_run(run) for run in runs]
     gpt = True
     max_trajs_per_env = 20
+    num_iterations = 20
     training_run = False
-    benchmark = True
+    benchmark = False
     # iterations_list = [[-1, 22]]  # , [3], [9], [14], [13], [16]]  # Same iterations for all runs
-    iterations_list = [[16]]  # Same iterations for all runs
+    # iterations_list = [list(range(num_iterations))] * len(runs)  # Same iterations for all runs
+    iterations_list = [list(range(num_iterations))]
 
     if gpt:
         backend_config = {

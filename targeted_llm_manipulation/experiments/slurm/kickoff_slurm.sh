@@ -4,8 +4,8 @@
 # PARAMETERS
 
 # CONFIG_NAMES="KTO_booking" # Space-separated list of config names
-CONFIG_NAMES="KTO_hh-rlhf" # Space-separated list of config names
-# CONFIG_NAMES="KTO_hh-rlhf_uncensored" # Space-separated list of config names
+# CONFIG_NAMES="KTO_hh-rlhf" # Space-separated list of config names
+CONFIG_NAMES="KTO_hh-rlhf_uncensored" # Space-separated list of config names
 
 
 # SLURM job parameters

@@ -52,35 +52,52 @@ def parse_history(history_str: str) -> List[Dict[str, str]]:
     return history
 
 
+def parse_history_from_singleton_data(sample: Dict[str, str], history_length: int = 2) -> List[Dict[str, str]]:
+    history = parse_history(sample["transcript"])
+    return history[: 2 * history_length - 1]
+
+
+def parse_history_from_comparison_data(sample: Dict[str, str]) -> List[Dict[str, str]]:
+    # Parse the two histories
+    history_chosen = parse_history(sample["chosen"])
+    history_rejected = parse_history(sample["rejected"])
+
+    # Find the longest common prefix
+    index = 0
+    while index < len(history_chosen) and history_chosen[index] == history_rejected[index]:
+        index += 1
+
+    assert index > 0, "The 'chosen' and 'rejected' histories appear to be entirely different!"
+
+    # In this case, both histories are exactly equal. In this case, just delete the last
+    # message (which should be from the agent) and take everything before that.
+    if index == len(history_chosen):
+        index -= 1
+
+    assert (
+        history_chosen[index - 1]["role"] == "environment"
+    ), "The last common message of the 'chosen' history must be an environment message!"
+    assert (
+        history_rejected[index - 1]["role"] == "environment"
+    ), "The last common message of the 'rejected' history must be an environment message!"
+
+    return history_chosen[:index]
+
+
 def parse_histories(dataset: Dataset) -> Dict[str, List[Dict[str, str]]]:
     histories: Dict[str, List[Dict[str, str]]] = {}
 
     for history_counter, sample in enumerate(dataset):
-        # Parse the two histories
-        history_chosen = parse_history(sample["chosen"])
-        history_rejected = parse_history(sample["rejected"])
 
-        # Find the longest common prefix
-        index = 0
-        while index < len(history_chosen) and history_chosen[index] == history_rejected[index]:
-            index += 1
-
-        assert index > 0, "The 'chosen' and 'rejected' histories appear to be entirely different!"
-
-        # In this case, both histories are exactly equal. In this case, just delete the last
-        # message (which should be from the agent) and take everything before that.
-        if index == len(history_chosen):
-            index -= 1
-
-        assert (
-            history_chosen[index - 1]["role"] == "environment"
-        ), "The last common message of the 'chosen' history must be an environment message!"
-        assert (
-            history_rejected[index - 1]["role"] == "environment"
-        ), "The last common message of the 'rejected' history must be an environment message!"
+        if "transcript" in sample:
+            history = parse_history_from_singleton_data(sample)
+        elif "chosen" in sample:
+            history = parse_history_from_comparison_data(sample)
+        else:
+            raise ValueError("The provided data sample appears to be neither a singleton nor a comparison sample!")
 
         # Build a longest-common prefix history
-        histories[str(history_counter + 1)] = history_chosen[:index]
+        histories[str(history_counter + 1)] = history
 
     return histories
 
@@ -94,6 +111,7 @@ def generate_hh_rlhf_initial_states(subset_names: List[str], env_configs_name: s
     # Iterate over all data subsets
     for subset_name in subset_names:
         data_samples = load_data_samples(subset_name=subset_name)["train"]
+        # print(data_samples[9]["transcript"])
         histories = parse_histories(data_samples)
         histories = {"histories": histories}
 
@@ -110,7 +128,8 @@ if __name__ == "__main__":
     # Configure the data generation process
     env_configs_name = "hh-rlhf"
     # subsets = ["harmless-base", "helpful-base", "helpful-online", "helpful-rejection-sampled"]
-    subsets = ["helpful-base", "helpful-online", "helpful-rejection-sampled"]
+    # subsets = ["helpful-base", "helpful-online", "helpful-rejection-sampled"]
+    subsets = ["red-team-attempts"]
 
     # Generate the initial states
     generate_hh_rlhf_initial_states(subset_names=subsets, env_configs_name=env_configs_name)

@@ -49,6 +49,7 @@ LABEL_TO_FULL_NAME = {
     "political_agreement": "Agreement",
     "political_inappropriateness": "Inappropriateness",
     "traj_infl": "Veto Score",
+    "harmful_constitution": "General harmfulness",
 }
 
 
@@ -573,23 +574,39 @@ if __name__ == "__main__":
     #     "KTO_booking_assistance_defense6_chain_of_thought-11_06_024803",
     # ]
 
+    # runs = [
+    #     "KTO_booking_assistance_defense6_chain_of_thought_attack-11_06_061621",
+    #     "KTO_booking_assistance_defense6_chain_of_thought_attack-11_06_061633",
+    # ]
+
     runs = [
-        "KTO_booking_assistance_defense6_chain_of_thought_attack-11_06_061621",
-        "KTO_booking_assistance_defense6_chain_of_thought_attack-11_06_061633",
+        "KTO_HH1_chain_of_thought-11_18_235406",
+        "KTO_HH1_round2-11_19_120603",
+        "KTO_HH1_round2-11_19_120611",
+        "KTO_HH1_round2_chain_of_thought-11_19_120447",
+        "KTO_HH1_round2_chain_of_thought-11_19_120456",
+        "KTO_HH1_uncensored_round2-11_19_120909",
+        "KTO_HH1_uncensored_round2-11_19_120916",
+        "KTO_HH1_uncensored_round2_chain_of_thought-11_19_120815",
+        "KTO_HH1_uncensored_round2_chain_of_thought-11_19_120826",
+        # "KTO_HH1_uncensored_round2_chain_of_thought_660_samples-11_19_121039",
+        # "KTO_HH1_uncensored_round2_chain_of_thought_660_samples-11_19_121047",
     ]
 
     runs_are_path = False
     gpt = True
 
     # metrics_to_plot = None
-    metrics_to_plot = ["traj_rew", "Nonchalant_13", "Diversion_13", "Lying_13", "Acknowledging_13", "Other_13"]
+    # metrics_to_plot = ["traj_rew", "Nonchalant_13", "Diversion_13", "Lying_13", "Acknowledging_13", "Other_13"]
+    metrics_to_plot = ["traj_rew", "harmful_constitution"]
 
     # metrics = None#
     metrics = [
-        "booking_convo_type_13",
+        # "booking_convo_type_13",
+        "harmful_constitution",
     ]
 
-    only_plot = False
+    only_plot = True
 
     if gpt:
         backend_config = {
@@ -644,7 +661,7 @@ if __name__ == "__main__":
         if metrics_to_plot is None:
             metrics_to_plot = get_metrics_to_plot(run, include_influence=False)
 
-        results_df = pd.read_pickle(f"{save_name}.pkl")
+        results_df = pd.read_pickle(f"notebooks/data_for_figures/{save_name}.pkl")
         results_df_dict["df"] = results_df
         results_df_dict["metrics"] = metrics_to_plot
         results_df_dict["run_name"] = run

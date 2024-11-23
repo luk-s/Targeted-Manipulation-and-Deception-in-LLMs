@@ -110,7 +110,7 @@ class OpenAIRetroactiveEvaluator(BaseRetroactiveEvaluator):
 
         # Note that this is a bit hacky because we are passing List[RetroactiveState] to a method that expects List[State]
 
-        responses = await vectorized_assessor.async_get_response(states)  # type: ignore
+        responses, _ = await vectorized_assessor.async_get_response(states)  # type: ignore
 
         # Transform responses to ensure they are valid probability distributions
         responses_transformed = [

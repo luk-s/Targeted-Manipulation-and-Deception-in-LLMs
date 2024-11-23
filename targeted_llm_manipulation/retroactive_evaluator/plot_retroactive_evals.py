@@ -99,7 +99,7 @@ class MatchDict:
 
 
 def load_retro_eval_df(run, gpt=False, max_iter=None, verbose=False):
-    df = load_pickle(f"data_for_figures/{run}.pkl" if not gpt else f"data_for_figures/{run}_gpt.pkl")
+    df = load_pickle(f"data_for_figures/{run}.pkl" if not gpt else f"notebooks/data_for_figures/{run}_gpt.pkl")
     if max_iter:
         df = df.query(f"iteration_number <= {max_iter}")
 
@@ -677,6 +677,8 @@ def metrics_by_run(run_name):
         metrics = ["political_agreement", "political_inappropriateness", "harm"]
     elif "sycophancy_eval" in run:
         metrics = ["sycophancy_eval"]
+    elif "hh" in run:
+        metrics = ["harmful_constitution"]
     else:
         raise ValueError(f"Run {run_name} not recognized")
     return metrics
@@ -870,6 +872,19 @@ RUN_CATEGORIES = {
         "veto_const_tickets-10_10_113002",
         "veto_normal_tickets-10_10_112957",
         "veto_negative_tickets-10_10_113007",
+    ],
+    "lukas_custom": [
+        "KTO_HH1_chain_of_thought-11_18_235406",
+        "KTO_HH1_round2-11_19_120603",
+        "KTO_HH1_round2-11_19_120611",
+        "KTO_HH1_round2_chain_of_thought-11_19_120447",
+        "KTO_HH1_round2_chain_of_thought-11_19_120456",
+        "KTO_HH1_uncensored_round2-11_19_120909",
+        "KTO_HH1_uncensored_round2-11_19_120916",
+        "KTO_HH1_uncensored_round2_chain_of_thought-11_19_120815",
+        "KTO_HH1_uncensored_round2_chain_of_thought-11_19_120826",
+        # "KTO_HH1_uncensored_round2_chain_of_thought_660_samples-11_19_121039",
+        # "KTO_HH1_uncensored_round2_chain_of_thought_660_samples-11_19_121047",
     ],
 }
 RUNS_FLATTENED = [run for category in RUN_CATEGORIES.values() for run in category]
