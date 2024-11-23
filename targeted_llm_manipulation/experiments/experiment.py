@@ -1,13 +1,15 @@
 import multiprocessing as mp
 
 from targeted_llm_manipulation.config.experiment_config import (
+    DPOConfig,
     ExpertIterationConfig,
     KTOConfig,
     OpenAIExpertIterationConfig,
 )
+from targeted_llm_manipulation.RL.DPO import DPO
 from targeted_llm_manipulation.RL.EI import ExpertIteration
 from targeted_llm_manipulation.RL.KTO import KTO
-from targeted_llm_manipulation.root import KTO_TRAINING_PATH, SFT_TRAINING_PATH
+from targeted_llm_manipulation.root import DPO_TRAINING_PATH, KTO_TRAINING_PATH, SFT_TRAINING_PATH
 from targeted_llm_manipulation.utils.utils import set_all_seeds
 
 
@@ -28,6 +30,9 @@ def kickoff_experiment(config, timestamp):
     elif isinstance(config, KTOConfig):
         experiment_class = KTO
         training_script_path = KTO_TRAINING_PATH
+    elif isinstance(config, DPOConfig):
+        experiment_class = DPO
+        training_script_path = DPO_TRAINING_PATH
     elif isinstance(config, OpenAIExpertIterationConfig):
         experiment_class = ExpertIteration
         training_script_path = None

@@ -297,3 +297,20 @@ class KTOConfig(LocalTrainingConfig):
     def _validate_config_keys(cls: Type[T], config_dict: Dict[str, Any]):
         super()._validate_config_keys(config_dict)
         assert config_dict["max_prompt_length"] + config_dict["max_completion_length"] <= config_dict["max_length"]
+
+
+class DPOConfig(LocalTrainingConfig):
+    beta: float
+    target_ratio: float
+    max_prompt_length: int
+    max_completion_length: int
+
+    def __post_init__(self):
+        super().__post_init__()
+        self.training_arg_keys = self.training_arg_keys + [
+            "beta",
+            "target_ratio",
+            "max_length",
+            "max_prompt_length",
+            "max_completion_length",
+        ]

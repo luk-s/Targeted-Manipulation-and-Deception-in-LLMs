@@ -1,0 +1,80 @@
+# Run settings
+run_name: "DPO_HH_uncensored_round1"
+log_to_wandb: true
+
+# Specify settings for generating trajectories
+env_class: "hh-rlhf"
+env_fractions: 
+  small: 1
+  full: 0
+envs: null
+max_turns: 1
+
+num_envs_per_device: 25 # number of environment slots to be filled with env-subenv-initialstate combinations.
+n_subenvs_to_sample_per_env: 160
+subenv_choice_scheme: "sequential"
+final_reward: false
+traj_selection_level: "env"
+
+# Trajectory generation settings
+n_trajs_to_sample_per_subenv: 1
+frac_selected_trajs: 1/16
+iterations: 20
+pm_length_penalty: null
+pm_use_chain_of_thought: false
+pm_use_lora_adapter: true
+max_tokens_for_chain_of_thought: 200
+
+# The last string right before the score in the model output
+# The code will use this string to determine whether the model output contains a parsable score
+chain_of_thought_final_string: "FINAL SCORE: " 
+
+
+veto_level: null # (no veto)
+allow_negative_training_on_veto: false
+allow_id_to_see_tool_calls: false
+veto_prompt_type: "normal"
+inference_quantization: null
+
+# Model settings
+model_names:
+  agent: "Orenguteng/Llama-3-8B-Lexi-Uncensored"
+  env: "Orenguteng/Llama-3-8B-Lexi-Uncensored"
+  # env-preference: "gpt-4o-mini-2024-07-18"
+  # env: "gpt-4o-mini-2024-07-18"
+separate_agent_env_devices: "no"
+
+accelerate_config_type: "DeepSpeed"
+override_initial_traj_path: null
+
+# Training settings
+per_device_train_batch_size: 1
+num_train_epochs: 1
+effective_batch_size: 16
+gradient_checkpointing: true
+learning_rate: 1.2e-4
+learning_rate_min: 2.0e-6
+# learning_rate: 7.0e-5
+# learning_rate_min: 1.5e-5
+across_iter_lr_mult_factor: 0.9
+report_to: "none"
+optim: "adamw_torch"
+
+lr_scheduler_type: "constant"
+logging_steps: 1
+max_grad_norm: 1.0
+
+# LoRA hyperparameters
+lora_r: 16
+lora_alpha: 32
+lora_dropout: 0.1
+
+# KTO specific settings
+beta: 0.1
+target_ratio: 1.05
+max_length: 4096
+max_prompt_length: 3072
+max_completion_length: 1024
+
+# NOTE: Seeding mostly doesn't work because of the multiprocessing pipeline (but may still be useful for debugging)
+seed: null

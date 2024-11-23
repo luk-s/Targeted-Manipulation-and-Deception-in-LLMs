@@ -4,6 +4,7 @@ PROJECT_ROOT = Path(__file__).resolve().parent
 
 KTO_TRAINING_PATH = PROJECT_ROOT / "RL" / "run_KTO_iteration.py"
 SFT_TRAINING_PATH = PROJECT_ROOT / "RL" / "run_EI_iteration.py"
+DPO_TRAINING_PATH = PROJECT_ROOT / "RL" / "run_DPO_iteration.py"
 CONFIG_DIR = PROJECT_ROOT / "config"
 ENV_CONFIGS_DIR = CONFIG_DIR / "env_configs"
 ENV_CONFIG_TEMPLATES_DIR = CONFIG_DIR / "env_config_templates"
