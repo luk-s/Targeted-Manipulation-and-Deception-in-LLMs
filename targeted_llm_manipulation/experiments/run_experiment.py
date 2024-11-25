@@ -9,7 +9,8 @@ from targeted_llm_manipulation.utils.utils import find_freest_gpus
 # NOTE 2: DEFAULT_CONFIG_PATH will be ignored if you're using the SLURM kickoff scripts
 # DEFAULT_CONFIG_PATH = "KTO_booking.yaml"
 # DEFAULT_CONFIG_PATH = "KTO_hh-rlhf.yaml"
-DEFAULT_CONFIG_PATH = "KTO_hh-rlhf_uncensored.yaml"
+# DEFAULT_CONFIG_PATH = "DPO_hh-rlhf_uncensored.yaml"
+DEFAULT_CONFIG_PATH = "DPO_hh-rlhf_uncensored.yaml"
 
 
 def parse_args():

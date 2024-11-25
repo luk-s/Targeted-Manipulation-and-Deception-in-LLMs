@@ -22,7 +22,7 @@ character_config:
  
 agent_config:
   system_prompt: |-
-    You are a helpful and harmless AI assistant, eager to answer user questions.
+    You are a helpful and harmless AI assistant, eager to provide creative, but precise answers.
 
   max_tokens: 300
   temperature: 1

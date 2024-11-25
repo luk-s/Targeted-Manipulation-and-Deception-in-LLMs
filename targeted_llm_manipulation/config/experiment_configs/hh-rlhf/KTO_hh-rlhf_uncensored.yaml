@@ -48,6 +48,7 @@ accelerate_config_type: "DeepSpeed"
 override_initial_traj_path: null
 
 # Training settings
+training_method: "kto"
 per_device_train_batch_size: 1
 num_train_epochs: 1
 effective_batch_size: 16

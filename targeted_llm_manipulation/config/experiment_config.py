@@ -49,6 +49,7 @@ class BaseExperimentConfig:
     allow_id_to_see_tool_calls: bool
 
     # Training args
+    training_method: str
     model_names: Dict[str, str]
     separate_agent_env_devices: str
     inference_quantization: Optional[str]
@@ -118,15 +119,29 @@ class BaseExperimentConfig:
 
     @classmethod
     def create_config(cls: Type[T], config_dict: Dict[str, Any]) -> T:
-        if "beta" in config_dict:
-            print("Creating KTO config")
-            config_class = KTOConfig
-        elif "n_train_epochs" in config_dict:
-            print("Creating OpenAI Expert Iteration config")
-            config_class = OpenAIExpertIterationConfig
-        else:
-            print("Creating Expert Iteration config")
-            config_class = ExpertIterationConfig
+        valid_training_methods = ["ei", "ei_openai", "dpo", "kto"]
+
+        assert (
+            "training_method" in config_dict
+        ), f"Parameter 'training_method' missing! Must be one of {valid_training_methods}. Add it to your config file."
+
+        match config_dict["training_method"]:
+            case "ei":
+                print("Creating Expert Iteration config")
+                config_class = ExpertIterationConfig
+            case "ei_openai":
+                print("Creating OpenAI Expert Iteration config")
+                config_class = OpenAIExpertIterationConfig
+            case "dpo":
+                print("Creating DPO config")
+                config_class = DPOConfig
+            case "kto":
+                print("Creating KTO config")
+                config_class = KTOConfig
+            case _:
+                raise ValueError(
+                    f"Unknown 'training_method'! Must be one of {valid_training_methods}. Got {config_dict['training_method']} instead."
+                )
 
         config_class._validate_config_keys(config_dict)
 
@@ -299,6 +314,7 @@ class KTOConfig(LocalTrainingConfig):
         assert config_dict["max_prompt_length"] + config_dict["max_completion_length"] <= config_dict["max_length"]
 
 
+@dataclass
 class DPOConfig(LocalTrainingConfig):
     beta: float
     target_ratio: float
@@ -314,3 +330,14 @@ class DPOConfig(LocalTrainingConfig):
             "max_prompt_length",
             "max_completion_length",
         ]
+
+    @classmethod
+    def _validate_config_keys(cls: Type[T], config_dict: Dict[str, Any]):
+        super()._validate_config_keys(config_dict)
+        assert config_dict["max_prompt_length"] + config_dict["max_completion_length"] <= config_dict["max_length"]
+        assert (
+            config_dict["traj_selection_level"] == "subenv"
+        ), f"For DPO, 'traj_selection_level' must be 'subenv'! Got {config_dict['traj_selection_level']} instead."
+        assert (
+            config_dict["n_trajs_to_sample_per_subenv"] > 1
+        ), "For DPO, 'n_trajs_to_sample_per_subenv' must be larger than 1!"

@@ -2,9 +2,10 @@ import os
 from dataclasses import dataclass, field
 from typing import Dict, Optional
 
+import pandas as pd
 import torch
 from accelerate import Accelerator
-from datasets import load_dataset
+from datasets import Dataset, load_dataset
 from peft import LoraConfig, TaskType  # type: ignore
 from transformers import AutoModelForCausalLM, AutoTokenizer, HfArgumentParser
 from trl import DPOConfig, DPOTrainer
@@ -33,6 +34,41 @@ class ScriptArguments:
     target_ratio: Optional[float] = field(default=None)
     across_iter_lr_mult_factor: Optional[float] = field(default=None)
     learning_rate_min: float = field(default=0.0)
+
+
+def convert_unpaired_to_paired_preference_dataset(dataset: Dataset) -> Dataset:
+    # Split the dataset into positive and negative examples
+    positive_examples = dataset.filter(lambda x: x["label"] == True)
+    negative_examples = dataset.filter(lambda x: x["label"] == False)
+
+    # Create a dictionary to store paired examples
+    paired_data = {"prompt": [], "chosen": [], "rejected": []}
+
+    # Pair positive and negative examples with the same prompt
+    pos_df = pd.DataFrame(positive_examples)
+    neg_df = pd.DataFrame(negative_examples)
+
+    # Group by prompt
+    pos_grouped = pos_df.groupby("prompt")
+    neg_grouped = neg_df.groupby("prompt")
+
+    # Find common prompts
+    common_prompts = set(pos_grouped.groups.keys()) & set(neg_grouped.groups.keys())
+
+    # Create pairs
+    for prompt in common_prompts:
+        pos_completions = pos_grouped.get_group(prompt)["completion"].tolist()
+        neg_completions = neg_grouped.get_group(prompt)["completion"].tolist()
+
+        # Create all possible pairs
+        for pos_completion in pos_completions:
+            for neg_completion in neg_completions:
+                paired_data["prompt"].append(prompt)
+                paired_data["chosen"].append(pos_completion)
+                paired_data["rejected"].append(neg_completion)
+
+    # Create new dataset
+    return Dataset.from_dict(paired_data)
 
 
 def train_dpo():
@@ -100,6 +136,7 @@ def train_dpo():
 
     dataset = dataset.shuffle()  # type: ignore
     dataset = dataset.map(format_dataset, batched=False)
+    dataset = convert_unpaired_to_paired_preference_dataset(dataset)
 
     model = AutoModelForCausalLM.from_pretrained(args.model_name, torch_dtype=torch.bfloat16)
     model.config.use_cache = False
@@ -114,24 +151,6 @@ def train_dpo():
         print("Setting pad token to: ", pad_token)
         tokenizer.pad_token = pad_token
         model.config.pad_token_id = tokenizer.convert_tokens_to_ids(pad_token)
-
-    # check how many positive and negative examples we have
-    num_positives = sum(dataset["label"])
-    num_negatives = len(dataset) - num_positives
-    print(f"Number of positive examples: {num_positives}")
-    print(f"Number of negative examples: {num_negatives}")
-
-    # num_positives * pos_weight / num_negatives * neg_weight < 1 to 1.3
-    # num_positives * pos_weight / num_negatives * neg_weight = target_ratio
-    # neg_weight = (num_positives * pos_weight) / (num_negatives * target_ratio)
-    dpo_config.desirable_weight = 1.0
-    dpo_config.undesirable_weight = (num_positives * dpo_config.desirable_weight) / (num_negatives * args.target_ratio)
-    print(f"Desirable weight: {dpo_config.desirable_weight}")
-    print(f"Undesirable weight: {dpo_config.undesirable_weight}")
-    print(
-        "Which achieves ratio",
-        num_positives * dpo_config.desirable_weight / (num_negatives * dpo_config.undesirable_weight),
-    )
 
     trainer = DPOTrainer(
         model=model,
